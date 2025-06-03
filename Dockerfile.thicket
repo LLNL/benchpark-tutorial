@@ -1,0 +1,12 @@
+# For testing
+# FROM test-caliper
+
+FROM ghcr.io/ilumsden/hpdc-caliper:2025-extra
+
+USER root
+
+RUN . /opt/global_py_venv/bin/activate && \
+    python3 -m pip install git+https://github.com/LLNL/thicket.git@develop
+    # python3 -m pip install llnl-thicket[extrap,plotting]==2024.2.1
+
+USER ${NB_USER}

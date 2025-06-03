@@ -1,0 +1,103 @@
+FROM ubuntu:noble
+
+# ubuntu:noble added a new 'ubuntu' user in the container.
+# Get rid of it!
+RUN userdel -r ubuntu
+
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    adduser \
+    vim \
+    nano \
+    emacs \
+    build-essential \
+    cmake \
+    python3 \
+    python3-dev \
+    python3-pip \
+    python3-venv \
+    openmpi-bin \
+    openmpi-common \
+    libopenmpi-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+SHELL [ "/bin/bash", "-c" ]
+
+RUN python3 -m venv /opt/global_py_venv
+
+RUN . /opt/global_py_venv/bin/activate && \
+    python3 -m pip install pybind11
+
+ENV CALI_INSTALL_PREFIX=/usr \
+    GIT_CLONE_STAGING_DIR=/tmp
+
+RUN git clone https://github.com/LLNL/Caliper.git ${GIT_CLONE_STAGING_DIR}/Caliper && \
+    cd ${GIT_CLONE_STAGING_DIR}/Caliper && \
+    git fetch origin && \
+    git checkout v2.12.1 && \
+    git submodule update --init --recursive && \
+    git clone https://github.com/LLNL/Adiak.git ${GIT_CLONE_STAGING_DIR}/Adiak && \
+    cd ${GIT_CLONE_STAGING_DIR}/Adiak && \
+    git fetch origin && \
+    git checkout v0.4.1 && \
+    git submodule update --init --recursive
+
+RUN cd ${GIT_CLONE_STAGING_DIR}/Adiak && \
+    mkdir build && \
+    cd build && \
+    cmake \
+    -DENABLE_MPI=ON \
+    -DCMAKE_C_COMPILER=$(which gcc) \
+    -DCMAKE_CXX_COMPILER=$(which g++) \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX=${CALI_INSTALL_PREFIX} \
+    .. && \
+    make -j && \
+    make install
+
+RUN . /opt/global_py_venv/bin/activate && \
+    cd ${GIT_CLONE_STAGING_DIR}/Caliper && \
+    mkdir build && \
+    cd build && \
+    cmake \
+    -DWITH_TOOLS=ON \
+    -DWITH_MPI=ON \
+    -DWITH_ADIAK=ON \
+    -DWITH_PYTHON_BINDINGS=ON \
+    -Dpybind11_DIR=$(pybind11-config --cmakedir) \
+    -DCMAKE_PREFIX_PATH=${CALI_INSTALL_PREFIX} \
+    -DCMAKE_C_COMPILER=$(which gcc) \
+    -DCMAKE_CXX_COMPILER=$(which g++) \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX=${CALI_INSTALL_PREFIX} \
+    .. && \
+    make -j && \
+    make install
+
+RUN rm -rf ${GIT_CLONE_STAGING_DIR}/Caliper && rm -rf ${GIT_CLONE_STAGING_DIR}/Adiak
+
+ENV NB_USER=jovyan \
+    NB_UID=1000 \
+    HOME=/home/jovyan
+
+RUN adduser \
+    --disabled-password \
+    --gecos "Default user" \
+    --uid ${NB_UID} \
+    --home ${HOME} \
+    --force-badname \
+    ${NB_USER}
+
+RUN chmod -R 777 ~/ ${HOME}
+
+ENV SHELL=/usr/bin/bash
+
+RUN mkdir -p ${HOME}/.local/share && \
+    chmod 777 ${HOME}/.local/share
+
+USER ${NB_USER}
+WORKDIR ${HOME}

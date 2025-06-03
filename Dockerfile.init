@@ -1,0 +1,17 @@
+FROM alpine/git
+
+USER root
+
+ENV NB_USER=jovyan \
+    NB_UID=1000 \
+    HOME=/home/jovyan
+
+RUN adduser \
+    -D \
+    -g "Default user" \
+    -u ${NB_UID} \
+    -h ${HOME} \
+    ${NB_USER}
+
+COPY ./init-entrypoint.sh /entrypoint.sh
+RUN chmod 777 /entrypoint.sh
