@@ -21,7 +21,7 @@ RUN apt-get update && \
 
 SHELL [ "/bin/bash", "-c" ]
 
-COPY ./requirements.txt /requirements.txt
+COPY ./docker/requirements.txt /requirements.txt
 
 RUN . /opt/global_py_venv/bin/activate && \
     # Needed for some viz in thicket-tutorial
@@ -34,7 +34,7 @@ RUN chmod -R 777 ~/ ${HOME}
 
 WORKDIR ${HOME}
 
-COPY ./spawn-entrypoint.sh /entrypoint.sh
+COPY ./docker/spawn-entrypoint.sh /entrypoint.sh
 RUN chmod 777 /entrypoint.sh
 
 USER ${NB_USER}

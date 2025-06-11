@@ -1,16 +1,7 @@
-name: Build containers and push to GHCR
+name: Build containers for testing PRs 
 
 on:
-  workflow_dispatch:
-    inputs:
-      tag:
-        type: string
-        description: Tag to use for the uploaded containers
-        required: true
-      tutorial_dir:
-        type: string
-        description: The directory (relative to repo root) for the tutorial you want to build 
-        required: true
+  pull_request: []
       
 jobs:
   setup_shared_matrix:
@@ -19,10 +10,14 @@ jobs:
       matrix_data: ${{ steps.set-matrix.outputs.matrix_data }}
         
     steps:
-      - id: set-matrix
-        run: |
-          matrix_data='{"docker_os": ["linux"], "docker_arch": ["amd64"]}'
-          echo "matrix_data=$matrix_data" >> "$GITHUB_OUTPUT"
+    - uses: actions/checkout@v4
+
+    - id: set-matrix
+      run: |
+        echo "$(pwd)"
+        ls -lah
+        matrix_data="$(cat github_ci_matrix.json | jq -c)"
+        echo "matrix_data=$matrix_data" >> "$GITHUB_OUTPUT"
 
   build_caliper_container:
     needs: setup_shared_matrix
@@ -31,10 +26,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        tag:
-          - ${{ github.event.inputs.tag }}
-        tutorial_dir:
-          - ${{ github.event.inputs.tutorial_dir }}
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
@@ -62,13 +55,6 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-
-    - name: Login to GHCR
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
             
     - name: Pull layers if they exist
       env:
@@ -84,12 +70,19 @@ jobs:
       run: |
         cd ${context}
         docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
-
-    - name: Deploy container
+        
+    - name: Save container to tarball
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
-      run: docker push ${container}
-
+        tar_dest: "${{ runner.temp }}/caliper_${{ matrix.docker_arch }}.tar"
+      run: docker save -o ${tar_dest} ${container}
+        
+    - name: Upload tarball as artifact to be used in downstream jobs
+      uses: actions/upload-artifact@v4
+      with:
+        name: caliper_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}/caliper_${{ matrix.docker_arch }}.tar
+          
   build_thicket_container:
     needs:
       - setup_shared_matrix
@@ -99,10 +92,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        tag:
-          - ${{ github.event.inputs.tag }}
-        tutorial_dir:
-          - ${{ github.event.inputs.tutorial_dir }}
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
@@ -130,19 +121,24 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-
-    - name: Login to GHCR
-      uses: docker/login-action@v2
+      
+    - name: Download Caliper image
+      uses: actions/download-artifact@v4
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
+        name: caliper_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}
+        
+    - name: Load Caliper image
+      env:
+        DEPENDENCY_IMAGE_TAR: ${{ runner.temp }}/caliper_${{ matrix.docker_arch }}.tar
+      run: |
+        docker load --input ${DEPENDENCY_IMAGE_TAR}
+        docker image ls -a
     - name: Pull layers if they exist
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker pull ${container} || echo "${container} has not yet been pushed"
-
+          
     - name: Build container 
       env:
         context: ${{ matrix.tutorial_dir }}
@@ -152,11 +148,18 @@ jobs:
       run: |
         cd ${context}
         docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
-
-    - name: Deploy container
+        
+    - name: Save container to tarball
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
-      run: docker push ${container}
+        tar_dest: "${{ runner.temp }}/thicket_${{ matrix.docker_arch }}.tar"
+      run: docker save -o ${tar_dest} ${container}
+        
+    - name: Upload tarball as artifact to be used in downstream jobs
+      uses: actions/upload-artifact@v4
+      with:
+        name: thicket_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}/thicket_${{ matrix.docker_arch }}.tar
           
   build_benchpark_container:
     needs:
@@ -167,10 +170,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        tag:
-          - ${{ github.event.inputs.tag }}
-        tutorial_dir:
-          - ${{ github.event.inputs.tutorial_dir }}
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
@@ -198,14 +199,19 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-
-    - name: Login to GHCR
-      uses: docker/login-action@v2
+      
+    - name: Download Thicket image
+      uses: actions/download-artifact@v4
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
+        name: thicket_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}
+        
+    - name: Load Thicket image
+      env:
+        DEPENDENCY_IMAGE_TAR: ${{ runner.temp }}/thicket_${{ matrix.docker_arch }}.tar
+      run: |
+        docker load --input ${DEPENDENCY_IMAGE_TAR}
+        docker image ls -a
     - name: Pull layers if they exist
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
@@ -220,12 +226,19 @@ jobs:
       run: |
         cd ${context}
         docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
-
-    - name: Deploy container
+        
+    - name: Save container to tarball
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
-      run: docker push ${container}
-
+        tar_dest: "${{ runner.temp }}/benchpark_${{ matrix.docker_arch }}.tar"
+      run: docker save -o ${tar_dest} ${container}
+        
+    - name: Upload tarball as artifact to be used in downstream jobs
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchpark_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}/benchpark_${{ matrix.docker_arch }}.tar
+          
   build_spawn_container:
     needs:
       - setup_shared_matrix
@@ -235,10 +248,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        tag:
-          - ${{ github.event.inputs.tag }}
-        tutorial_dir:
-          - ${{ github.event.inputs.tutorial_dir }}
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
@@ -266,14 +277,19 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-
-    - name: Login to GHCR
-      uses: docker/login-action@v2
+      
+    - name: Download Benchpark image
+      uses: actions/download-artifact@v4
       with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
+        name: benchpark_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}
+        
+    - name: Load Benchpark image
+      env:
+        DEPENDENCY_IMAGE_TAR: ${{ runner.temp }}/benchpark_${{ matrix.docker_arch }}.tar
+      run: |
+        docker load --input ${DEPENDENCY_IMAGE_TAR}
+        docker image ls -a
     - name: Pull layers if they exist
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
@@ -288,11 +304,6 @@ jobs:
       run: |
         cd ${context}
         docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
-
-    - name: Deploy container
-      env:
-        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
-      run: docker push ${container}
           
   build_init_container:
     needs:
@@ -302,10 +313,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        tag: 
-          - ${{ github.event.inputs.tag }}
-        tutorial_dir:
-          - ${{ github.event.inputs.tutorial_dir }}
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
@@ -334,13 +343,6 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Login to GHCR
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
     - name: Pull layers if they exist
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
@@ -355,8 +357,3 @@ jobs:
       run: |
         cd ${context}
         docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
-
-    - name: Deploy container
-      env:
-        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
-      run: docker push ${container}

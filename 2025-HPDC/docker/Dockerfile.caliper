@@ -61,7 +61,7 @@ RUN cd ${GIT_CLONE_STAGING_DIR}/Adiak && \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_PREFIX=${CALI_INSTALL_PREFIX} \
     .. && \
-    make -j && \
+    make -j 4 && \
     make install
 
 RUN . /opt/global_py_venv/bin/activate && \
@@ -80,7 +80,7 @@ RUN . /opt/global_py_venv/bin/activate && \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_PREFIX=${CALI_INSTALL_PREFIX} \
     .. && \
-    make -j && \
+    make -j 4 && \
     make install
 
 RUN rm -rf ${GIT_CLONE_STAGING_DIR}/Caliper && rm -rf ${GIT_CLONE_STAGING_DIR}/Adiak

@@ -1,6 +1,6 @@
-# Benchmarking Tutorial
+# Reproducible Benchmarking Tutorial
 
-This repo contains the material for tutorials on LLNL's benchmarking efforts associated with
+This repo contains the material for tutorials on LLNL's reproducible benchmarking efforts associated with
 tools like Caliper, Thicket, and Benchpark. To see the materials for a given tutorial,
 navigate to the appropriate folder.
 
