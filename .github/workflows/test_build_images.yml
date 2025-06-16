@@ -1,0 +1,359 @@
+name: Build containers for testing PRs 
+
+on:
+  pull_request: []
+      
+jobs:
+  setup_shared_matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix_data: ${{ steps.set-matrix.outputs.matrix_data }}
+        
+    steps:
+    - uses: actions/checkout@v4
+
+    - id: set-matrix
+      run: |
+        echo "$(pwd)"
+        ls -lah
+        matrix_data="$(cat github_ci_matrix.json | jq -c)"
+        echo "matrix_data=$matrix_data" >> "$GITHUB_OUTPUT"
+
+  build_caliper_container:
+    needs: setup_shared_matrix
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
+        docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
+        docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
+        containers_to_build:
+          - ["docker/Dockerfile.caliper", "ghcr.io/llnl/caliper"]
+            
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Remove unneeded stuff to make space for container
+      uses: jlumbroso/free-disk-space@v1.3.1
+      with:
+        tool-cache: true 
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: false 
+        swap-storage: true
+          
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v4
+        
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+            
+    - name: Pull layers if they exist
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+      run: docker pull ${container} || echo "${container} has not yet been pushed"
+          
+    - name: Build container 
+      env:
+        context: ${{ matrix.tutorial_dir }}
+        dockerfile: ${{ matrix.containers_to_build[0] }}
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+        platform: "${{ matrix.docker_os }}/${{ matrix.docker_arch }}"
+      run: |
+        cd ${context}
+        docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
+        
+    - name: Save container to tarball
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+        tar_dest: "${{ runner.temp }}/caliper_${{ matrix.docker_arch }}.tar"
+      run: docker save -o ${tar_dest} ${container}
+        
+    - name: Upload tarball as artifact to be used in downstream jobs
+      uses: actions/upload-artifact@v4
+      with:
+        name: caliper_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}/caliper_${{ matrix.docker_arch }}.tar
+          
+  build_thicket_container:
+    needs:
+      - setup_shared_matrix
+      - build_caliper_container
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
+        docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
+        docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
+        containers_to_build:
+          - ["docker/Dockerfile.thicket", "ghcr.io/llnl/thicket"]
+            
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Remove unneeded stuff to make space for container
+      uses: jlumbroso/free-disk-space@v1.3.1
+      with:
+        tool-cache: true 
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: false 
+        swap-storage: true
+          
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v4
+        
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Download Caliper image
+      uses: actions/download-artifact@v4
+      with:
+        name: caliper_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}
+        
+    - name: Load Caliper image
+      env:
+        DEPENDENCY_IMAGE_TAR: ${{ runner.temp }}/caliper_${{ matrix.docker_arch }}.tar
+      run: |
+        docker load --input ${DEPENDENCY_IMAGE_TAR}
+        docker image ls -a
+    - name: Pull layers if they exist
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+      run: docker pull ${container} || echo "${container} has not yet been pushed"
+          
+    - name: Build container 
+      env:
+        context: ${{ matrix.tutorial_dir }}
+        dockerfile: ${{ matrix.containers_to_build[0] }}
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+        platform: "${{ matrix.docker_os }}/${{ matrix.docker_arch }}"
+      run: |
+        cd ${context}
+        docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
+        
+    - name: Save container to tarball
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+        tar_dest: "${{ runner.temp }}/thicket_${{ matrix.docker_arch }}.tar"
+      run: docker save -o ${tar_dest} ${container}
+        
+    - name: Upload tarball as artifact to be used in downstream jobs
+      uses: actions/upload-artifact@v4
+      with:
+        name: thicket_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}/thicket_${{ matrix.docker_arch }}.tar
+          
+  build_benchpark_container:
+    needs:
+      - setup_shared_matrix
+      - build_thicket_container
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
+        docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
+        docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
+        containers_to_build:
+          - ["docker/Dockerfile.benchpark", "ghcr.io/llnl/benchpark"]
+            
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Remove unneeded stuff to make space for container
+      uses: jlumbroso/free-disk-space@v1.3.1
+      with:
+        tool-cache: true 
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: false 
+        swap-storage: true
+          
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v4
+        
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Download Thicket image
+      uses: actions/download-artifact@v4
+      with:
+        name: thicket_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}
+        
+    - name: Load Thicket image
+      env:
+        DEPENDENCY_IMAGE_TAR: ${{ runner.temp }}/thicket_${{ matrix.docker_arch }}.tar
+      run: |
+        docker load --input ${DEPENDENCY_IMAGE_TAR}
+        docker image ls -a
+    - name: Pull layers if they exist
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+      run: docker pull ${container} || echo "${container} has not yet been pushed"
+          
+    - name: Build container 
+      env:
+        context: ${{ matrix.tutorial_dir }}
+        dockerfile: ${{ matrix.containers_to_build[0] }}
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+        platform: "${{ matrix.docker_os }}/${{ matrix.docker_arch }}"
+      run: |
+        cd ${context}
+        docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
+        
+    - name: Save container to tarball
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+        tar_dest: "${{ runner.temp }}/benchpark_${{ matrix.docker_arch }}.tar"
+      run: docker save -o ${tar_dest} ${container}
+        
+    - name: Upload tarball as artifact to be used in downstream jobs
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchpark_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}/benchpark_${{ matrix.docker_arch }}.tar
+          
+  build_spawn_container:
+    needs:
+      - setup_shared_matrix
+      - build_benchpark_container
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
+        docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
+        docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
+        containers_to_build:
+          - ["docker/Dockerfile.spawn", "ghcr.io/llnl/reproducible-benchmarking-spawn"]
+            
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Remove unneeded stuff to make space for container
+      uses: jlumbroso/free-disk-space@v1.3.1
+      with:
+        tool-cache: true 
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: false 
+        swap-storage: true
+          
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v4
+        
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Download Benchpark image
+      uses: actions/download-artifact@v4
+      with:
+        name: benchpark_image_${{ matrix.docker_arch }}
+        path: ${{ runner.temp }}
+        
+    - name: Load Benchpark image
+      env:
+        DEPENDENCY_IMAGE_TAR: ${{ runner.temp }}/benchpark_${{ matrix.docker_arch }}.tar
+      run: |
+        docker load --input ${DEPENDENCY_IMAGE_TAR}
+        docker image ls -a
+    - name: Pull layers if they exist
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+      run: docker pull ${container} || echo "${container} has not yet been pushed"
+          
+    - name: Build container 
+      env:
+        context: ${{ matrix.tutorial_dir }}
+        dockerfile: ${{ matrix.containers_to_build[0] }}
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+        platform: "${{ matrix.docker_os }}/${{ matrix.docker_arch }}"
+      run: |
+        cd ${context}
+        docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
+          
+  build_init_container:
+    needs:
+      - setup_shared_matrix
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        tag: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tag }}
+        tutorial_dir: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).tutorial_dir }}
+        docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
+        docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
+        containers_to_build:
+          - ["docker/Dockerfile.init", "ghcr.io/llnl/reproducible-benchmarking-init"]
+            
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Remove unneeded stuff to make space for container
+      uses: jlumbroso/free-disk-space@v1.3.1
+      with:
+        tool-cache: true 
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: false 
+        swap-storage: true
+          
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v4
+        
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Pull layers if they exist
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+      run: docker pull ${container} || echo "${container} has not yet been pushed"
+          
+    - name: Build container 
+      env:
+        context: ${{ matrix.tutorial_dir }}
+        dockerfile: ${{ matrix.containers_to_build[0] }}
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+        platform: "${{ matrix.docker_os }}/${{ matrix.docker_arch }}"
+      run: |
+        cd ${context}
+        docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .

@@ -1,0 +1,14 @@
+{
+    "tag": [
+        "hpdc-2025"
+    ],
+    "tutorial_dir": [
+        "2025-HPDC"
+    ],
+    "docker_os": [
+        "linux"
+    ],
+    "docker_arch": [
+        "amd64"
+    ]
+}

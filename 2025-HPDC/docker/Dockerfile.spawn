@@ -1,0 +1,52 @@
+# Copyright 2025 Lawrence Livermore National Security, LLC and other
+# Benchpark developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# For testing
+# FROM test-benchpark
+
+FROM ghcr.io/llnl/benchpark:hpdc-2025
+
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    dnsutils \
+    iputils-ping \
+    tini \
+    && rm -rf /var/lib/apt/lists/*
+
+SHELL [ "/bin/bash", "-c" ]
+
+COPY ./docker/requirements.txt /requirements.txt
+
+RUN . /opt/global_py_venv/bin/activate && \
+    # Needed for some viz in thicket-tutorial
+    python3 -m pip install plotly[express] && \
+    python3 -m pip install -r /requirements.txt && \
+    python3 -m pip install ipython==7.34.0 ipykernel==6.25.1 && \
+    python3 -m IPython kernel install
+
+RUN chmod -R 777 ~/ ${HOME}
+
+WORKDIR ${HOME}
+
+COPY ./docker/spawn-entrypoint.sh /entrypoint.sh
+RUN chmod 777 /entrypoint.sh
+
+USER ${NB_USER}
+
+RUN git clone https://github.com/LLNL/thicket-tutorial.git ${HOME}/thicket-tutorial && \
+    cd ${HOME}/thicket-tutorial && \
+    git submodule update --init --recursive && \
+    git clone https://github.com/daboehme/caliper-tutorial.git ${HOME}/caliper-tutorial && \
+    cd ${HOME}/caliper-tutorial && \
+    git submodule update --init --recursive
+
+EXPOSE 8888
+ENTRYPOINT [ "tini", "--" ]
+
+CMD ["jupyter", "lab"]
