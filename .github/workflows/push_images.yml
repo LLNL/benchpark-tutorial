@@ -38,7 +38,7 @@ jobs:
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
-          - ["docker/Dockerfile.caliper", "ghcr.io/ilumsden/hpdc-caliper"]
+          - ["docker/Dockerfile.caliper", "ghcr.io/LLNL/caliper"]
             
     steps:
     - uses: actions/checkout@v4
@@ -106,7 +106,7 @@ jobs:
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
-          - ["docker/Dockerfile.thicket", "ghcr.io/ilumsden/hpdc-thicket"]
+          - ["docker/Dockerfile.thicket", "ghcr.io/LLNL/thicket"]
             
     steps:
     - uses: actions/checkout@v4
@@ -174,7 +174,7 @@ jobs:
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
-          - ["docker/Dockerfile.benchpark", "ghcr.io/ilumsden/hpdc-benchpark"]
+          - ["docker/Dockerfile.benchpark", "ghcr.io/LLNL/benchpark"]
             
     steps:
     - uses: actions/checkout@v4
@@ -242,7 +242,7 @@ jobs:
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
-          - ["docker/Dockerfile.spawn", "ghcr.io/ilumsden/hpdc-test-spawn"]
+          - ["docker/Dockerfile.spawn", "ghcr.io/LLNL/reproducible-benchmarking-spawn"]
             
     steps:
     - uses: actions/checkout@v4
@@ -309,7 +309,7 @@ jobs:
         docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
-          - ["docker/Dockerfile.init", "ghcr.io/ilumsden/hpdc-test-init"]
+          - ["docker/Dockerfile.init", "ghcr.io/LLNL/reproducible-benchmarking-init"]
             
     steps:
     - uses: actions/checkout@v4
