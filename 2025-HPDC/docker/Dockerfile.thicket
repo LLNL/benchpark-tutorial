@@ -6,7 +6,7 @@
 # For testing
 # FROM test-caliper
 
-FROM ghcr.io/ilumsden/hpdc-caliper:2025-extra
+FROM ghcr.io/ilumsden/hpdc-caliper:hpdc-2025
 
 USER root
 
