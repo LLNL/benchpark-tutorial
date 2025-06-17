@@ -35,7 +35,9 @@ RUN chmod -R 777 ~/ ${HOME}
 WORKDIR ${HOME}
 
 COPY ./docker/spawn-entrypoint.sh /entrypoint.sh
+COPY ./docker/spawn-local-entrypoint.sh /local-entrypoint.sh
 RUN chmod 777 /entrypoint.sh
+RUN chmod 777 /local-entrypoint.sh
 
 USER ${NB_USER}
 
