@@ -85,14 +85,16 @@ Testing the Tutorial Locally
 To test the tutorial locally, you first need to build all the Docker images except the init image. Before building,
 keep in mind the following dependencies between images:
 
-.. code::
+.. code-block::
+
    ghcr.io/llnl/caliper --> ghcr.io/llnl/thicket --> ghcr.io/llnl/benchpark --> ghcr.io/llnl/reproducible-benchmarking-spawn
 
 Because of these dependencies, the first thing you should figure out is which (if any) images you need to build locally.
 If a Dockerfile has changes that are **not** on GHCR, you will need to build that image *and all downstream images (based on the flowchart above)*
 locally before testing. To build an image locally, run the following from this directory (**not the** :code:`docker` **directory**):
 
-.. code:: bash
+.. code-block:: bash
+
    $ docker build -t <image_name> -f ./docker/<dockerfile_for_image> . # Note the trailing "." 
 
 In the command above, :code:`<image_name>` should be one of the GHCR URLs above, followed by a colon, followed by a tag. It could look something
@@ -103,7 +105,8 @@ in :code:`./docker/Dockerfile.spawn`.
 If all the changes to the corresponding Dockerfiles in :code:`docker` have already been pushed to GHCR, you do not need to build locally.
 Instead, you should just pull the spawn image using:
 
-.. code:: bash
+.. code-block:: bash
+
    $ docker pull ghcr.io/llnl/reproducible-benchmarking-spawn:<tag>
 
 You should replace :code:`<tag>` in the command above with the GHCR tag of the image you want to pull.
@@ -111,7 +114,8 @@ You should replace :code:`<tag>` in the command above with the GHCR tag of the i
 After you have a built spawn image (either by building locally or by pulling from GHCR), you can run the spawn image locally
 by running the following command:
 
-.. code:: bash
+.. code-block:: bash
+
    $ docker run --rm -it --entrypoint <entrypoint> --name reproducible_benchmark_tutorial_local -p 8888:8888 <spawn_image_name>
 
 In the command above, :code:`<spawn_image_name>` is the name of the built spawn image. If you built that image locally, this argument
