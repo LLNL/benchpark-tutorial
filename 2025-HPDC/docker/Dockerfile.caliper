@@ -3,11 +3,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-FROM ubuntu:noble
+# FROM ubuntu:noble
+FROM fluxrm/flux-sched:noble
 
 # ubuntu:noble added a new 'ubuntu' user in the container.
 # Get rid of it!
-RUN userdel -r ubuntu
+# RUN userdel -r ubuntu
 
 USER root
 
