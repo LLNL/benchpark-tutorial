@@ -36,7 +36,7 @@ kubectl delete pod --all-namespaces --all --force
 
 echo ""
 echo "Deleting the EKS cluster:"
-eksctl delete cluster --config-file /Users/lumsden1/projects/pave/hpdc-tutorial/hpdc-tutorial-docker-test/2025-HPDC/infrastructure/test-c7i-24xlarge/eksctl-config.yaml --wait
+eksctl delete cluster --config-file ./eksctl-config.yaml --wait
 
 echo ""
 echo "Everything is now cleaned up!"
