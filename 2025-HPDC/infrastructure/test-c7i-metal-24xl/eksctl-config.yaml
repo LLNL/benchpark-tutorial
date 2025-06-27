@@ -59,6 +59,7 @@ iam:
 # Specify the availability zone from which nodes will be obtained
 availabilityZones:
 - "us-west-1a"
+- "us-west-1c"
 
 
 # Define rules for nodegroups for each availability zone
@@ -82,6 +83,28 @@ managedNodeGroups:
     privateNetworking: true
     availabilityZones:
       - us-west-1a
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/jupyterhub: "owned"
+
+  - name: node-group-us-west-1c
+    # Set policies/permissions to autoscale
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    # Instance type to allocate
+    instanceType: c7i.metal-24xl
+    # Size of storage volume for the availability zone, in gigabytes
+    volumeSize: 30
+    # Number of nodes to start with in this availability zone
+    desiredCapacity: 1
+    # Minimum number of nodes that will always be allocated in this availability zone
+    minSize: 1
+    # Maximum number of nodes that will every be allocated in this availability zone
+    maxSize: 1
+    privateNetworking: true
+    availabilityZones:
+      - us-west-1c
     tags:
       k8s.io/cluster-autoscaler/enabled: "true"
       k8s.io/cluster-autoscaler/jupyterhub: "owned"

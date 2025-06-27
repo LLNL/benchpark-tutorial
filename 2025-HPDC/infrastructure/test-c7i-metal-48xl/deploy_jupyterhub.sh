@@ -14,7 +14,7 @@ helm repo add jupyterhub https://hub.jupyter.org/helm-chart/
 helm repo update
 echo ""
 echo "Installing the Helm chart and deploying JupyterHub to EKS:"
-helm install hpdc-2025-c7i-metal-48xl-jupyter jupyterhub/jupyterhub --version 4.2.0 --values /Users/lumsden1/projects/pave/hpdc-tutorial/hpdc-tutorial-docker-test/2025-HPDC/infrastructure/test-c7i-metal-48xl/helm-config.yaml
+helm install hpdc-2025-c7i-metal-48xl-jupyter jupyterhub/jupyterhub --version 4.2.0 --values ./helm-config.yaml
 
 echo ""
 echo "Done deploying JupyterHub!"

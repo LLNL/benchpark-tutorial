@@ -9,6 +9,6 @@ if ! command -v helm >/dev/null 2>&1; then
     exit 1
 fi
 
-helm upgrade hpdc-2025-c7i-metal-24xl-jupyter jupyterhub/jupyterhub  --values /Users/lumsden1/projects/pave/hpdc-tutorial/hpdc-tutorial-docker-test/2025-HPDC/infrastructure/test-c7i-metal-24xl/helm-config.yaml
+helm upgrade hpdc-2025-c7i-metal-24xl-jupyter jupyterhub/jupyterhub  --values ./helm-config.yaml
 
 echo "The JupyterHub deployment is updated!"

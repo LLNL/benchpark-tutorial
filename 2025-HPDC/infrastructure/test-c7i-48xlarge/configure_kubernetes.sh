@@ -11,10 +11,10 @@ fi
 
 echo "Configuring the Cluster Autoscaler:"
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
-kubectl apply -f /Users/lumsden1/projects/pave/hpdc-tutorial/hpdc-tutorial-docker-test/2025-HPDC/infrastructure/test-c7i-48xlarge/cluster-autoscaler.yaml
+kubectl apply -f ./cluster-autoscaler.yaml
 echo ""
 echo "Configuring the Storage Class:"
-kubectl apply -f /Users/lumsden1/projects/pave/hpdc-tutorial/hpdc-tutorial-docker-test/2025-HPDC/infrastructure/test-c7i-48xlarge/storage-class.yaml
+kubectl apply -f ./storage-class.yaml
 
 echo ""
 echo "Patching the cluster to make the configured storage class the default:"

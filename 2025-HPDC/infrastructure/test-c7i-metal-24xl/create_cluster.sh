@@ -10,7 +10,7 @@ if ! command -v eksctl >/dev/null 2>&1; then
 fi
 
 echo "Creating EKS cluster with eksctl:"
-eksctl create cluster --config-file /Users/lumsden1/projects/pave/hpdc-tutorial/hpdc-tutorial-docker-test/2025-HPDC/infrastructure/test-c7i-metal-24xl/eksctl-config.yaml
+eksctl create cluster --config-file ./eksctl-config.yaml
 
 echo "Done creating the EKS cluster!"
 echo ""
