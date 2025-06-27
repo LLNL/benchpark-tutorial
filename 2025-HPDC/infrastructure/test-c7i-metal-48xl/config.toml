@@ -49,6 +49,5 @@ init_image_entrypoint = "/entrypoint.sh"
 
 [aws."utility scripts"]
 tutorial_name = "hpdc-2025-c7i-metal-48xl"
-config_output_dir = "/Users/lumsden1/projects/pave/hpdc-tutorial/hpdc-tutorial-docker-test/2025-HPDC/infrastructure/test-c7i-metal-48xl"
 jupyterhub_helm_version = "4.2.0"
 ebs_storage_type = "gp3"

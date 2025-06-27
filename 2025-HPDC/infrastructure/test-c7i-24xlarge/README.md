@@ -3,7 +3,7 @@
 These config files and scripts can be used to deploy the hpdc-2025-c7i-24xlarge tutorial to EKS.
 
 The sections below walk you through the steps to deploying your cluster. All commands in these
-sections should be run from the `/Users/lumsden1/projects/pave/hpdc-tutorial/hpdc-tutorial-docker-test/2025-HPDC/infrastructure/test-c7i-24xlarge` directory.
+sections should be run from the same directory as this README.
 
 ## Step 1: Create EKS cluster
 
