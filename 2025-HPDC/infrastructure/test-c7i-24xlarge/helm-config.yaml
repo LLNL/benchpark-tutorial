@@ -1,0 +1,113 @@
+# Uncomment if you need to debug your deployment of Jupyter.
+# For more information on debugging, see:
+# https://z2jh.jupyter.org/en/stable/administrator/debug.html
+# debug:
+#   enabled: true
+
+hub:
+  # Maximum number of users with spawned JupyterLab environments (i.e., pods) at a time
+  concurrentSpawnLimit: 5
+  config:
+    # Define a password for login
+    DummyAuthenticator:
+      password: butter
+    JupyterHub:
+      admin_access: true
+      authenticator_class: dummy
+
+  # Define storage quantity for JupyterHub's persistent database
+  # We could explicitly set storage class name here,
+  # but we won't because we've marked the storage class defined
+  # in storage-class.yaml as default
+  db:
+    pvc:
+      storage: 32Gi
+      storageClassName: gp3
+
+  # Specify the hub image for the tutorial.
+  # The hub image should be based off of the jupyterhub/k8s-hub image.
+  # Its job is twofold:
+  #   1) If desired, replace the login page (at /usr/local/share/jupyterhub/templates/login.html) with a custom HTML login page
+  #   2) Set the user
+  image:
+    name: jupyterhub/k8s-hub
+    tag: "4.2.0"
+    pullPolicy: Always
+
+  # Define resource usage for JupyterHub
+  # For large tutorials, it is recommended to set these higher
+  
+  # We are just using defualt resource usage
+  
+
+  # Define custom hostname for JupyterHub
+  
+  # We are not using a custom hostname
+  
+
+# Based on optimization recommendations from:
+# https://z2jh.jupyter.org/en/latest/administrator/optimization.html#scaling-up-in-time-user-placeholders
+# scheduling:
+#   podPriority:
+#     enabled: true
+#   userPlaceholder:
+#     replicas: 3
+
+# Define the spawner and init containers for each attendee's pod
+singleuser:
+  # Specify the spawner image for the tutorial.
+  # The spawner image should do the following:
+  #   1) Install any necessary software
+  #   2) Define the user for the tutorial (we usually default to jovyan)
+  #   3) If custom Python packages are needed, it's often recommended to install a custom Jupyter kernel with `IPython kernel install`
+  #   4) If you want a custom Jupyter launcher UI, install the appropriate packages and update JUPYTER_APP_LAUNCHER_PATH
+  #   5) Copy any necessary local scripts or files and ensure proper permissions
+  image:
+    name: ghcr.io/llnl/reproducible-benchmarking-spawn
+    tag: "hpdc-2025"
+    pullPolicy: Always
+  # Specify the minimum (i.e., guarantee) and maximum (i.e., limit) amount of resources per user
+  cpu:
+    limit: 94
+    guarantee: 94
+  memory:
+    limit: "190G"
+    guarantee: "190G"
+  # If needed, specify a custom entrypoint into the spawner image.
+  # For more information, look at the documentation for Docker ENTRYPOINT and CMD directives:
+  # https://www.docker.com/blog/docker-best-practices-choosing-between-run-cmd-and-entrypoint/
+  cmd: /entrypoint.sh
+  # Specify the init image for the tutorial.
+  # This image is optional, but it can be used to do last second configuration or installation of files
+  # before the user gains control of the pod.
+  #
+  # A good usecase for the init image is to set permissions and ensure the tutorial user will be able to
+  # access the files for your tutorial. An example Dockerfile for the init image may look like:
+  #
+  # Dockerfile:
+  #   FROM alpine/git
+  #   ENV NB_USER=jovyan \
+  #       NB_UID=1000 \
+  #       HOME=/home/jovyan
+  #
+  #   RUN adduser \
+  #       -D \
+  #       -g "Default user" \
+  #       -u ${NB_UID} \
+  #       -h ${HOME} \
+  #       ${NB_USER}
+  #
+  #   COPY ./init-entrypoint.sh /entrypoint.sh
+  #
+  # The 'command' field for the init container specifies the entrypoint for the container. For the Dockerfile
+  # above, the entrypoint should be "/entrypoint.sh". This script could look something like this:
+  #
+  # entrypoint.sh (would be ./init-entrypoint.sh on your local computer)
+  #    chown -R 1000 /home/jovyan
+  initContainers:
+    - name: init-tutorial-service
+      image: ghcr.io/llnl/reproducible-benchmarking-init:hpdc-2025
+      command: ["/entrypoint.sh"]
+      imagePullPolicy: Always
+  storage:
+    type: none

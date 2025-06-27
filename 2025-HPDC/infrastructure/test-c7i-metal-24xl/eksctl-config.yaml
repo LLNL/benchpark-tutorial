@@ -1,0 +1,87 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+# Define the name of the cluster and the deployment region
+metadata:
+  name: hpdc-2025-c7i-metal-24xl
+  region: us-west-1
+
+# Create the IAM policies needed to enable the autoscaler and storage
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: cluster-autoscaler
+        namespace: kube-system
+        labels:
+          aws-usage: "cluster-ops"
+          app.kubernetes.io/name: cluster-autoscaler
+
+      # https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md
+      attachPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "autoscaling:DescribeAutoScalingGroups"
+              - "autoscaling:DescribeAutoScalingInstances"
+              - "autoscaling:DescribeLaunchConfigurations"
+              - "autoscaling:DescribeTags"
+              - "autoscaling:SetDesiredCapacity"
+              - "autoscaling:TerminateInstanceInAutoScalingGroup"
+              - "ec2:DescribeLaunchTemplateVersions"
+            Resource: "*"
+
+    - metadata:
+        name: ebs-csi-controller-sa
+        namespace: kube-system
+        labels:
+          aws-usage: "cluster-ops"
+          app.kubernetes.io/name: aws-ebs-csi-driver
+      attachPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "ec2:AttachVolume"
+              - "ec2:CreateSnapshot"
+              - "ec2:CreateTags"
+              - "ec2:CreateVolume"
+              - "ec2:DeleteSnapshot"
+              - "ec2:DeleteTags"
+              - "ec2:DeleteVolume"
+              - "ec2:DescribeInstances"
+              - "ec2:DescribeSnapshots"
+              - "ec2:DescribeTags"
+              - "ec2:DescribeVolumes"
+              - "ec2:DetachVolume"
+            Resource: "*"
+
+# Specify the availability zone from which nodes will be obtained
+availabilityZones:
+- "us-west-1a"
+
+
+# Define rules for nodegroups for each availability zone
+managedNodeGroups:
+
+  - name: node-group-us-west-1a
+    # Set policies/permissions to autoscale
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    # Instance type to allocate
+    instanceType: c7i.metal-24xl
+    # Size of storage volume for the availability zone, in gigabytes
+    volumeSize: 30
+    # Number of nodes to start with in this availability zone
+    desiredCapacity: 1
+    # Minimum number of nodes that will always be allocated in this availability zone
+    minSize: 1
+    # Maximum number of nodes that will every be allocated in this availability zone
+    maxSize: 1
+    privateNetworking: true
+    availabilityZones:
+      - us-west-1a
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/jupyterhub: "owned"
