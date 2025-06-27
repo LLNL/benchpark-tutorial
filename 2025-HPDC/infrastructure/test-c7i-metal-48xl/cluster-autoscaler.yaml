@@ -1,0 +1,272 @@
+# The roles defined in this config file set permissions on several Kubernetes resources.
+#
+# Resources referred to:
+#   * events: resource representing information/responses generated from actions or changes taken against the cluster
+#   * endpoints: resource representing REST API endpoints within the cluster
+#   * pods/eviction: resource that terminates and removes pods when created
+#   * pods/status: resource used to query or edit the status of pods
+#   * nodes: resource representing the physical or virtual nodes of the cluster
+#   * namespaces: resource representing a group of isolated resources within the cluster
+#   * pods: resource representing a unit of computation that is deployed to a node
+#   * services: resource representing a networked application running in a pod and exposed over the network (either internal to the cluster or external to the broader internet)
+#   * replicationcontrollers: legacy resource for managing horizontal scaling (i.e., scale-out). Used for broader support across clouds
+#   * persistantvolumeclaims: resource representing a request for storage by a user
+#   * persistantvolumes: resource representing actual storage
+#   * replicasets: resource that creates replica pods that are used to ensure some minimum number of identical pods in the cluster
+#   * daemonsets: resource that ensures copies of pods are deployed to new nodes and removed from removed nodes
+#   * poddisruptionbudgets: resource that represents the cluster policy regarding the minimum number of pods that must remain available
+#                           during voluntary disruptions (i.e., pod/node eviction not caused by something like hardware failure)
+#   * statefulsets: resource that maintains pod state
+#   * storageclasses: resource that describes different types of storage. Often used for things like QoS levels
+#   * csinodes: resource that describes a node's ability to interact with one or more storage providers. Mainly used by Kubernetes's scheduler
+#   * csidrivers: resource that provide information on the drivers for a single storage provider installed on a node
+#   * csistoragecapacities: resource that describes the available storage from different providers
+#   * jobs: resource that represents one-off tasks spread across one or more pods that must run to completion. Useful for certain types of setup and elasticity work
+#   * leases: resource that allows different pods, nodes, or kublets (kubernetes daemon on a node) to lock shared resources. Think of it like a mutex
+#   * configmaps: resource representing non-confidential key-value pair info. Often used to decouple environment-specific configuration from container images
+---
+# Create a Service Account that will act as the internal user during the creation
+# of the autoscaling infrastructure and have all the appropriate roles and permissions assigned
+# to do its work
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    k8s-addons: cluster-autoscaler.addons.k8s.io
+    k8s-app: cluster-autoscaler
+  name: cluster-autoscaler
+  namespace: kube-system
+---
+# Create a ClusterRole to set permissions for associated
+# users across the entire cluster
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-autoscaler
+  labels:
+    k8s-addons: cluster-autoscaler.addons.k8s.io
+    k8s-app: cluster-autoscaler
+rules:
+  # Allow associated users to create or partially update events and endpoints
+  - apiGroups: [""]
+    resources: ["events", "endpoints"]
+    verbs: ["create", "patch"]
+  # Allow associated users to evict pods
+  - apiGroups: [""]
+    resources: ["pods/eviction"]
+    verbs: ["create"]
+  # Allow associated users to update pod statuses
+  - apiGroups: [""]
+    resources: ["pods/status"]
+    verbs: ["update"]
+  # Allow associated users to get and update the state of the autoscaler
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    resourceNames: ["cluster-autoscaler"]
+    verbs: ["get", "update"]
+  # Allow associated users to be notified of changes to, list, get the state of,
+  # and fully update information related to nodes
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["watch", "list", "get", "update"]
+  # Allow associated users to be notified of changes to, list, and get the state of
+  # namespaces, pods, services, replication controllers, persistent volume claims, and
+  # persistent volumes
+  - apiGroups: [""]
+    resources:
+      - "namespaces"
+      - "pods"
+      - "services"
+      - "replicationcontrollers"
+      - "persistentvolumeclaims"
+      - "persistentvolumes"
+    verbs: ["watch", "list", "get"]
+  # Allow associated users to be notified of changes to, list, and get the state of
+  # replica sets, and daemon sets
+  - apiGroups: ["extensions"]
+    resources: ["replicasets", "daemonsets"]
+    verbs: ["watch", "list", "get"]
+  # Allow associated users to be notified of changes to and list pod disruption budgets
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["watch", "list"]
+  # Allow associated users to be notified of changes to, list, and get the state of
+  # stateful sets, replica sets, and daemon sets
+  - apiGroups: ["apps"]
+    resources: ["statefulsets", "replicasets", "daemonsets"]
+    verbs: ["watch", "list", "get"]
+  # Allow associated users to be notified of chagnes to, list, and get the state of
+  # all resources related to available storage
+  - apiGroups: ["storage.k8s.io"]
+    resources:
+      ["storageclasses", "csinodes", "csidrivers", "csistoragecapacities"]
+    verbs: ["watch", "list", "get"]
+  # Allow associated users to get the state of, list, be notified of chagnes to, and partially update
+  # jobs launched in the cluster
+  - apiGroups: ["batch", "extensions"]
+    resources: ["jobs"]
+    verbs: ["get", "list", "watch", "patch"]
+  # Allow associated users to create leases
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["create"]
+  # Allow associated users to get the state of and fully update leases in the autoscaler
+  - apiGroups: ["coordination.k8s.io"]
+    resourceNames: ["cluster-autoscaler"]
+    resources: ["leases"]
+    verbs: ["get", "update"]
+---
+# Create a Role to set permissions within the 'kube-system' namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cluster-autoscaler
+  # The permissions in this Role apply to the 'kube-system' namespace
+  namespace: kube-system
+  labels:
+    k8s-addons: cluster-autoscaler.addons.k8s.io
+    k8s-app: cluster-autoscaler
+rules:
+  # Allow associated users to create, list, and be notified of changes to config maps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["create", "list", "watch"]
+  # Allow associated users to delete, get the state of, fully update, and be notified of
+  # changes to config maps in the autoscaler's status and priority-expander subresources
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames:
+      - "cluster-autoscaler-status"
+      - "cluster-autoscaler-priority-expander"
+    verbs: ["delete", "get", "update", "watch"]
+---
+# Grant permissions defined by the ClusterRole
+# to users defined by the ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-autoscaler
+  labels:
+    k8s-addons: cluster-autoscaler.addons.k8s.io
+    k8s-app: cluster-autoscaler
+# Use the ClusterRole named "cluster-autoscaler" in the binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-autoscaler
+# Use the ServiceAccount named "cluster-autoscaler"
+# in the "kube-system" workspace in the binding
+subjects:
+  - kind: ServiceAccount
+    name: cluster-autoscaler
+    namespace: kube-system
+---
+# Grant permissions defined by the Role
+# to users defined by the ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cluster-autoscaler
+  namespace: kube-system
+  labels:
+    k8s-addons: cluster-autoscaler.addons.k8s.io
+    k8s-app: cluster-autoscaler
+# Use the Role named "cluster-autoscaler" in the binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cluster-autoscaler
+# Use the ServiceAccount named "cluster-autoscaler"
+# in the "kube-system" workspace in the binding
+subjects:
+  - kind: ServiceAccount
+    name: cluster-autoscaler
+    namespace: kube-system
+---
+# Define deployment rules for pods and ReplicaSets
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cluster-autoscaler
+  namespace: kube-system
+  labels:
+    app: cluster-autoscaler
+spec:
+  replicas: 1 # Number of pods to run
+  # Apply to pods where the app has a label called 'app'
+  # with value 'cluster-autoscaler'
+  selector:
+    matchLabels:
+      app: cluster-autoscaler
+  # Definition of created pods
+  template:
+    metadata:
+      labels:
+        app: cluster-autoscaler
+      # Allow Prometheus to collect monitoring data over port 8085
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8085"
+    spec:
+      priorityClassName: system-cluster-critical
+      securityContext:
+        # The Kubelet must be run as a non-root user
+        runAsNonRoot: true
+        runAsUser: 65534
+        fsGroup: 65534
+        # Use the default seccomp profile as specified by the
+        # container runtime
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: cluster-autoscaler
+      # The container(s) to run within the pod.
+      # Since we're running an autoscaler, we'll run the autoscaler
+      # as the pod's only container, and then we'll deploy other
+      # containers within the autoscaler to actually do work
+      containers:
+        # The main container for the pod will be the
+        # Kubernetes autoscaling container
+        - image: registry.k8s.io/autoscaling/cluster-autoscaler:v1.26.2
+          name: cluster-autoscaler
+          resources:
+            # Maximum amount of compute resources allowed
+            limits:
+              cpu: 100m
+              memory: 600Mi
+            # Minimum amount of compute resources required
+            # Defaults to 'limits' if not specified
+            requests:
+              cpu: 100m
+              memory: 600Mi
+          command:
+            - ./cluster-autoscaler
+            - --v=4
+            - --stderrthreshold=info
+            - --cloud-provider=aws
+            - --skip-nodes-with-local-storage=false
+            - --expander=least-waste
+            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/jupyterhub
+          volumeMounts:
+            # Mount the CA SSL/TLS certificates into the container
+            - name: ssl-certs
+              mountPath: /etc/ssl/certs/ca-certificates.crt
+              readOnly: true
+          # Always pull the digest of the image from the
+          # container registry. If the locally cached digest is
+          # the same as the pulled digest, use the cached container image.
+          # Otherwise, pull the container from the registry
+          imagePullPolicy: "Always"
+          securityContext:
+            # Don't let the pod have more privileges than the
+            # parent process
+            allowPrivilegeEscalation: false
+            capabilities:
+              # Remove all capabilities
+              drop:
+                - ALL
+            # Root filesystem (i.e., '/') is read-only
+            readOnlyRootFilesystem: true
+      volumes:
+        - name: ssl-certs
+          hostPath:
+            path: "/etc/ssl/certs/ca-bundle.crt"
