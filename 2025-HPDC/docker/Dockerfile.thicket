@@ -11,7 +11,7 @@ FROM ghcr.io/llnl/caliper:hpdc-2025
 USER root
 
 RUN . /opt/global_py_venv/bin/activate && \
-    python3 -m pip install git+https://github.com/LLNL/thicket.git@develop[plotting]
+    python3 -m pip install "llnl-thicket[plotting] @ git+https://github.com/LLNL/thicket.git@develop"
 # python3 -m pip install llnl-thicket[extrap,plotting]==2024.2.1
 
 USER ${NB_USER}
