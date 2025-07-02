@@ -95,7 +95,7 @@ ENV FLUX_URI_RESOLVE_LOCAL=t
 COPY ./tutorial-code/caliper-tutorial/tutorial ${HOME}/caliper-tutorial/
 COPY ./tutorial-code/thicket-tutorial/data ${HOME}/thicket-tutorial/data/
 COPY ./tutorial-code/thicket-tutorial/notebooks ${HOME}/thicket-tutorial/notebooks/
-COPY ./tutorial-code/thicket-tutorial/LICENSE ${HOME}/thicket-tutorial/LICENSE
+COPY ./tutorial-code/thicket-tutorial/LICENSE ${HOME}/thicket-tutorial/
 
 COPY tutorial-code/system-description/aws-tutorial ${HOME}/benchpark/systems/aws-tutorial
 COPY tutorial-code/system-description/AWS_Tutorial-c7i-EFA ${HOME}/benchpark/systems/all_hardware_descriptions/AWS_Tutorial-c7i-EFA
