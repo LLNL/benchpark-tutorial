@@ -30,6 +30,46 @@ RUN . /opt/global_py_venv/bin/activate && \
     python3 -m pip install ipython==7.34.0 ipykernel==6.25.1 && \
     python3 -m IPython kernel install
 
+COPY ./tutorial-code/thicket-tutorial/requirements.txt /tmp/thicket-tutorial/requirements.txt
+
+RUN . /opt/global_py_venv/bin/activate && \
+    python3 -m pip install -r /tmp/thicket-tutorial/requirements.txt
+
+COPY ./tutorial-code/caliper-tutorial/apps /tmp/caliper-tutorial/apps/
+COPY ./tutorial-code/caliper-tutorial/cmake /tmp/caliper-tutorial/cmake/
+
+ENV CALI_TUTORIAL_INSTALL_PREFIX=/usr
+
+RUN cmake \
+    -B /tmp/build-basic-example \
+    -C /tmp/caliper-tutorial/cmake/basic_example.cmake \
+    -DCMAKE_INSTALL_PREFIX="${CALI_TUTORIAL_INSTALL_PREFIX}" \
+    -S /tmp/caliper-tutorial/apps/basic_example && \
+    cmake --build "/tmp/build-basic-example" --parallel 4 && \
+    cmake --install "/tmp/build-basic-example"
+# && \
+# rm -rf /tmp/build-basic-example
+
+RUN cmake \
+    -B /tmp/build-lulesh \
+    -C /tmp/caliper-tutorial/cmake/lulesh-mpi.cmake \
+    -DCMAKE_INSTALL_PREFIX="${CALI_TUTORIAL_INSTALL_PREFIX}" \
+    -S /tmp/caliper-tutorial/apps/LULESH && \
+    cmake --build "/tmp/build-lulesh" --parallel 4 && \
+    cmake --install "/tmp/build-lulesh"
+# && \
+# rm -rf /tmp/build-lulesh
+
+RUN cmake \
+    -B /tmp/build-xsbench \
+    -C /tmp/caliper-tutorial/cmake/xsbench-mpi.cmake \
+    -DCMAKE_INSTALL_PREFIX="${CALI_TUTORIAL_INSTALL_PREFIX}" \
+    -S /tmp/caliper-tutorial/apps/XSBench && \
+    cmake --build "/tmp/build-xsbench" --parallel 4 && \
+    cmake --install "/tmp/build-xsbench"
+# && \
+# rm -rf /tmp/build-xsbench
+
 RUN chmod -R 777 ~/ ${HOME}
 
 WORKDIR ${HOME}
@@ -41,12 +81,11 @@ RUN chmod 777 /local-entrypoint.sh
 
 USER ${NB_USER}
 
-RUN git clone https://github.com/LLNL/thicket-tutorial.git ${HOME}/thicket-tutorial && \
-    cd ${HOME}/thicket-tutorial && \
-    git submodule update --init --recursive && \
-    git clone https://github.com/daboehme/caliper-tutorial.git ${HOME}/caliper-tutorial && \
-    cd ${HOME}/caliper-tutorial && \
-    git submodule update --init --recursive
+# TODO copy and setup final tutorial materials here
+COPY ./tutorial-code/caliper-tutorial/tutorial ${HOME}/caliper-tutorial/
+COPY ./tutorial-code/thicket-tutorial/data ${HOME}/thicket-tutorial/data/
+COPY ./tutorial-code/thicket-tutorial/notebooks ${HOME}/thicket-tutorial/notebooks/
+COPY ./tutorial-code/thicket-tutorial/LICENSE ${HOME}/thicket-tutorial/LICENSE
 
 EXPOSE 8888
 ENTRYPOINT [ "tini", "--" ]
