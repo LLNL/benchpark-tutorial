@@ -1,0 +1,6 @@
+[submodule "2025-HPDC/tutorial-code/thicket-tutorial"]
+	path = 2025-HPDC/tutorial-code/thicket-tutorial
+	url = https://github.com/LLNL/thicket-tutorial.git
+[submodule "2025-HPDC/tutorial-code/caliper-tutorial"]
+	path = 2025-HPDC/tutorial-code/caliper-tutorial
+	url = https://github.com/daboehme/caliper-tutorial.git
