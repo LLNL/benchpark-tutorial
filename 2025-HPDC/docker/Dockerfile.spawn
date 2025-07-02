@@ -85,7 +85,7 @@ USER ${NB_USER}
 COPY ./tutorial-code/caliper-tutorial/tutorial ${HOME}/caliper-tutorial/
 COPY ./tutorial-code/thicket-tutorial/data ${HOME}/thicket-tutorial/data/
 COPY ./tutorial-code/thicket-tutorial/notebooks ${HOME}/thicket-tutorial/notebooks/
-COPY ./tutorial-code/thicket-tutorial/LICENSE ${HOME}/thicket-tutorial/LICENSE
+COPY ./tutorial-code/thicket-tutorial/LICENSE ${HOME}/thicket-tutorial/
 
 EXPOSE 8888
 ENTRYPOINT [ "tini", "--" ]
