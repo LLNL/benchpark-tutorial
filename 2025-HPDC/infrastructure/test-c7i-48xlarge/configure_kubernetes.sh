@@ -10,7 +10,7 @@ if ! command -v kubectl >/dev/null 2>&1; then
 fi
 
 echo "Configuring the Cluster Autoscaler:"
-kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
+kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=1.45.0"
 kubectl apply -f ./cluster-autoscaler.yaml
 echo ""
 echo "Configuring the Storage Class:"

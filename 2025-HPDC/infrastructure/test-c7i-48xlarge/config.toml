@@ -50,4 +50,5 @@ init_image_entrypoint = "/entrypoint.sh"
 [aws."utility scripts"]
 tutorial_name = "hpdc-2025-c7i-48xlarge"
 jupyterhub_helm_version = "4.2.0"
+ebs_csidriver_version = "1.45.0"
 ebs_storage_type = "gp3"
