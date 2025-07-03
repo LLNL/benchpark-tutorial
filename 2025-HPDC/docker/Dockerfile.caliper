@@ -25,10 +25,13 @@ RUN apt-get update && \
     python3-dev \
     python3-pip \
     python3-venv \
-    openmpi-bin \
-    openmpi-common \
-    libopenmpi-dev \
     git \
+    # NOTE: the flux-sched image already pulls and builds MPICH 4.2.2
+    #       WITHOUT PMIx support (this is important because PMIx is a pain, and
+    #       requires extra setup with Flux).
+    # openmpi-bin \
+    # openmpi-common \
+    # libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
 SHELL [ "/bin/bash", "-c" ]
@@ -98,12 +101,26 @@ RUN adduser \
     --force-badname \
     ${NB_USER}
 
+# NOTE: this should NEVER be uncommented by the time we push to GHCR
+RUN adduser ${NB_USER} sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
 RUN chmod -R 777 ~/ ${HOME}
 
 ENV SHELL=/usr/bin/bash
 
 RUN mkdir -p ${HOME}/.local/share && \
     chmod 777 ${HOME}/.local/share
+
+RUN echo $(flux env) 
+
+RUN echo 'export PATH=/usr/bin:$PATH' >> ${HOME}/.bashrc && \
+    echo '. /opt/global_py_venv/bin/activate' >> ${HOME}/.bashrc && \
+    echo 'export LD_LIBRARY_PATH=/usr/lib:/usr/lib64:$LD_LIBRARY_PATH' >> ${HOME}/.bashrc
+
+RUN echo 'export PATH=/usr/bin:$PATH' >> ${HOME}/.bash_profile && \
+    echo '. /opt/global_py_venv/bin/activate' >> ${HOME}/.bash_profile && \
+    echo 'export LD_LIBRARY_PATH=/usr/lib:/usr/lib64:$LD_LIBRARY_PATH' >> ${HOME}/.bash_profile
 
 USER ${NB_USER}
 WORKDIR ${HOME}
