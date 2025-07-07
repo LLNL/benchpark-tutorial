@@ -22,6 +22,8 @@ RUN apt-get update && \
     xz-utils \
     zstd \
     bzip2 \
+    liblapack-dev \
+    libblas-dev \
     && rm -rf /var/lib/apt/lists/*
 
 SHELL [ "/bin/bash", "-c" ]
