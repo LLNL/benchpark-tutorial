@@ -1,0 +1,54 @@
+[aws.eksctl]
+cluster_name = "hpdc-2025-c7i-metal-24xl"
+cluster_deployment_region = "us-west-1"
+cluster_availability_zones = [
+    "us-west-1a",
+    "us-west-1c",
+]
+
+[[aws.eksctl.cluster_node_groups]]
+zone = "us-west-1a"
+instance_type = "c7i.metal-24xl"
+volume_size = 30
+desired_size = 1
+min_size = 1
+max_size = 1
+
+[[aws.eksctl.cluster_node_groups]]
+zone = "us-west-1c"
+instance_type = "c7i.metal-24xl"
+volume_size = 30
+desired_size = 1
+min_size = 1
+max_size = 1
+
+[aws."Kubernetes autoscaler"]
+cpu_max = "100m"
+memory_max = "600Mi"
+cpu_min = "100m"
+memory_min = "600Mi"
+
+[aws.Helm]
+tutorial_name = "hpdc-2025-c7i-metal-24xl"
+max_concurrent_users = 2
+hub_password = "butter"
+hub_db_capacity = "32Gi"
+ebs_storage_type = "gp3"
+hub_container_image = "jupyterhub/k8s-hub"
+hub_container_tag = "4.2.0"
+spawner_container_image = "ghcr.io/llnl/reproducible-benchmarking-spawn"
+spawner_container_tag = "hpdc-2025"
+spawner_image_entrypoint = "/entrypoint.sh"
+cpu_min = "94"
+cpu_max = "94"
+mem_min = "160G"
+mem_max = "160G"
+init_container_image = "ghcr.io/llnl/reproducible-benchmarking-init"
+init_container_tag = "hpdc-2025"
+init_image_entrypoint = "/entrypoint.sh"
+
+[aws."utility scripts"]
+tutorial_name = "hpdc-2025-c7i-metal-24xl"
+jupyterhub_helm_version = "4.2.0"
+ebs_csidriver_version = "1.45.0"
+ebs_storage_type = "gp3"
