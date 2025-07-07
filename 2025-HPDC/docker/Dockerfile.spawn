@@ -40,6 +40,8 @@ RUN chmod 777 /entrypoint.sh
 RUN chmod 777 /local-entrypoint.sh
 
 USER ${NB_USER}
+ENV SHELL=/usr/bin/bash
+ENV FLUX_URI_RESOLVE_LOCAL=t
 
 RUN git clone https://github.com/LLNL/thicket-tutorial.git ${HOME}/thicket-tutorial && \
     cd ${HOME}/thicket-tutorial && \
@@ -51,4 +53,4 @@ RUN git clone https://github.com/LLNL/thicket-tutorial.git ${HOME}/thicket-tutor
 EXPOSE 8888
 ENTRYPOINT [ "tini", "--" ]
 
-CMD ["jupyter", "lab"]
+CMD ["flux", "start", "jupyter", "lab"]
