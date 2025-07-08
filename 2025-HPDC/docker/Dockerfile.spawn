@@ -16,8 +16,7 @@ RUN apt-get update && \
     ca-certificates \
     dnsutils \
     iputils-ping \
-    tini \
-    && rm -rf /var/lib/apt/lists/*
+    tini
 
 SHELL [ "/bin/bash", "-c" ]
 
@@ -30,6 +29,14 @@ RUN . /opt/global_py_venv/bin/activate && \
     # Covered in requirements.txt, so shouldn't be needed here
     # python3 -m pip install ipython==7.34.0 ipykernel==6.25.1 && \
     python3 -m IPython kernel install
+
+COPY ./docker/kitware-archive.sh /tmp
+
+RUN /tmp/kitware-archive.sh && \
+    apt install -y cmake && \
+    which cmake && \
+    cmake --version && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN chmod -R 777 ~/ ${HOME}
 
