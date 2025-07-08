@@ -27,7 +27,8 @@ RUN . /opt/global_py_venv/bin/activate && \
     # Needed for some viz in thicket-tutorial
     python3 -m pip install plotly[express] && \
     python3 -m pip install -r /requirements.txt && \
-    python3 -m pip install ipython==7.34.0 ipykernel==6.25.1 && \
+    # Covered in requirements.txt, so shouldn't be needed here
+    # python3 -m pip install ipython==7.34.0 ipykernel==6.25.1 && \
     python3 -m IPython kernel install
 
 RUN chmod -R 777 ~/ ${HOME}
