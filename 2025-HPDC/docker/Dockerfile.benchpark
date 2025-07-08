@@ -53,6 +53,5 @@ RUN mkdir -p ${HOME}/.local/share && \
 USER ${NB_USER}
 
 # Run this to trigger bootstrap
-# TODO change to new benchpark bootstrap command
 RUN . /opt/global_py_venv/bin/activate && \
-    ${HOME}/benchpark/bin/benchpark audit -h
+    ${HOME}/benchpark/bin/benchpark bootstrap
