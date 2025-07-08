@@ -26,6 +26,11 @@ RUN apt-get update && \
     python3-pip \
     python3-venv \
     git \
+    util-linux \
+    less \
+    htop \
+    zip \
+    unzip \
     # NOTE: the flux-sched image already pulls and builds MPICH 4.2.2
     #       WITHOUT PMIx support (this is important because PMIx is a pain, and
     #       requires extra setup with Flux).
