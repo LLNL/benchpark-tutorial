@@ -12,6 +12,6 @@ fi
 helm uninstall hpdc-2025-c7i-metal-48xl-jupyter
 
 echo "Helm's JupyterHub deployment is torn down."
-echo "If any attendee pods are remaining, you can delete them with `kubectl delete pod <pod_name>`"
+echo "If any attendee pods are remaining, you can delete them with 'kubectl delete pod <pod_name>'"
 echo ""
 echo "To recreate the JupyterHub deployment, just run deploy_jupyterhub.sh again."

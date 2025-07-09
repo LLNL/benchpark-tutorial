@@ -58,6 +58,9 @@ RUN git clone https://github.com/LLNL/thicket-tutorial.git ${HOME}/thicket-tutor
     cd ${HOME}/caliper-tutorial && \
     git submodule update --init --recursive
 
+COPY tutorial-code/system-description/aws-tutorial ${HOME}/benchpark/systems/aws-tutorial
+COPY tutorial-code/system-description/AWS_Tutorial-c7i-EFA ${HOME}/benchpark/systems/all_hardware_descriptions/AWS_Tutorial-c7i-EFA
+
 EXPOSE 8888
 ENTRYPOINT [ "tini", "--" ]
 

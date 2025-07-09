@@ -43,6 +43,7 @@ cpu_min = "190"
 cpu_max = "190"
 mem_min = "350G"
 mem_max = "350G"
+provide_extra_shmem = true
 init_container_image = "ghcr.io/llnl/reproducible-benchmarking-init"
 init_container_tag = "hpdc-2025"
 init_image_entrypoint = "/entrypoint.sh"

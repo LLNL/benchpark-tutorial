@@ -111,3 +111,11 @@ singleuser:
       imagePullPolicy: Always
   storage:
     type: none
+    extraVolumes:
+      - name: shm-volume
+        emptyDir:
+          medium: Memory
+    extraVolumeMounts:
+      - name: shm-volume
+        mountPath: /dev/shm
+    
