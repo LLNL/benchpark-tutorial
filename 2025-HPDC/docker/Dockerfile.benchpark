@@ -32,6 +32,7 @@ USER ${NB_USER}
 
 RUN git clone https://github.com/LLNL/benchpark.git ${HOME}/benchpark && \
     cd ${HOME}/benchpark && \
+    git checkout -b develop-2025-07-08 develop-2025-07-08 && \
     git submodule update --init --recursive
 
 USER root
