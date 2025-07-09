@@ -53,7 +53,7 @@ RUN cmake \
     -C /tmp/caliper-tutorial/cmake/basic_example.cmake \
     -DCMAKE_INSTALL_PREFIX="${CALI_TUTORIAL_INSTALL_PREFIX}" \
     -S /tmp/caliper-tutorial/apps/basic_example && \
-    cmake --build "/tmp/build-basic-example" --parallel 4 && \
+    cmake --build "/tmp/build-basic-example" && \
     cmake --install "/tmp/build-basic-example"
 # && \
 # rm -rf /tmp/build-basic-example
@@ -63,7 +63,7 @@ RUN cmake \
     -C /tmp/caliper-tutorial/cmake/lulesh-mpi.cmake \
     -DCMAKE_INSTALL_PREFIX="${CALI_TUTORIAL_INSTALL_PREFIX}" \
     -S /tmp/caliper-tutorial/apps/LULESH && \
-    cmake --build "/tmp/build-lulesh" --parallel 4 && \
+    cmake --build "/tmp/build-lulesh" && \
     cmake --install "/tmp/build-lulesh"
 # && \
 # rm -rf /tmp/build-lulesh
@@ -73,7 +73,7 @@ RUN cmake \
     -C /tmp/caliper-tutorial/cmake/xsbench-mpi.cmake \
     -DCMAKE_INSTALL_PREFIX="${CALI_TUTORIAL_INSTALL_PREFIX}" \
     -S /tmp/caliper-tutorial/apps/XSBench && \
-    cmake --build "/tmp/build-xsbench" --parallel 4 && \
+    cmake --build "/tmp/build-xsbench" && \
     cmake --install "/tmp/build-xsbench"
 # && \
 # rm -rf /tmp/build-xsbench
