@@ -91,9 +91,9 @@ USER ${NB_USER}
 ENV SHELL=/usr/bin/bash
 ENV FLUX_URI_RESOLVE_LOCAL=t
 
-COPY ./tutorial-code/caliper-tutorial/tutorial ${HOME}/caliper-tutorial/
-COPY ./tutorial-code/thicket-tutorial/data ${HOME}/thicket-tutorial/data/
-COPY ./tutorial-code/thicket-tutorial/notebooks ${HOME}/thicket-tutorial/notebooks/
+COPY tutorial-code/caliper-tutorial/tutorial ${HOME}/caliper-tutorial/
+COPY tutorial-code/thicket-tutorial/data/ ${HOME}/thicket-tutorial/data/
+COPY tutorial-code/thicket-tutorial/notebooks ${HOME}/thicket-tutorial/notebooks/
 # TODO figure out a way to copy the LICENSE file that GH Actions will accept
 # COPY ./tutorial-code/thicket-tutorial/LICENSE ${HOME}/thicket-tutorial
 
