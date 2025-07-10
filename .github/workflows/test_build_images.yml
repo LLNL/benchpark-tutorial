@@ -11,6 +11,8 @@ jobs:
         
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: "recursive"
 
     - id: set-matrix
       run: |
@@ -35,6 +37,8 @@ jobs:
             
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: "recursive"
 
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
@@ -101,6 +105,8 @@ jobs:
             
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: "recursive"
 
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
@@ -179,6 +185,8 @@ jobs:
             
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: "recursive"
 
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
@@ -257,6 +265,8 @@ jobs:
             
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: "recursive"
 
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
@@ -322,6 +332,8 @@ jobs:
             
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: "recursive"
 
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
