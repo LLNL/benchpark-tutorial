@@ -1,6 +1,6 @@
-# Deploy hpdc-2025-c7i-24xlarge to AWS Elastic Kubernetes Service (EKS)
+# Deploy hpdc-2025-pave-dry-run to AWS Elastic Kubernetes Service (EKS)
 
-These config files and scripts can be used to deploy the hpdc-2025-c7i-24xlarge tutorial to EKS.
+These config files and scripts can be used to deploy the hpdc-2025-pave-dry-run tutorial to EKS.
 
 The sections below walk you through the steps to deploying your cluster. All commands in these
 sections should be run from the same directory as this README.

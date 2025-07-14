@@ -68,11 +68,11 @@ singleuser:
     pullPolicy: Always
   # Specify the minimum (i.e., guarantee) and maximum (i.e., limit) amount of resources per user
   cpu:
-    limit: 94
-    guarantee: 94
+    limit: 32
+    guarantee: 32
   memory:
-    limit: "160G"
-    guarantee: "160G"
+    limit: "64G"
+    guarantee: "64G"
   # If needed, specify a custom entrypoint into the spawner image.
   # For more information, look at the documentation for Docker ENTRYPOINT and CMD directives:
   # https://www.docker.com/blog/docker-best-practices-choosing-between-run-cmd-and-entrypoint/

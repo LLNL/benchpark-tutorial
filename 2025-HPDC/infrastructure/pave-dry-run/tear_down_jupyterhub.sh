@@ -9,7 +9,7 @@ if ! command -v helm >/dev/null 2>&1; then
     exit 1
 fi
 
-helm uninstall hpdc-2025-c7i-24xlarge-jupyter
+helm uninstall hpdc-2025-pave-dry-run-jupyter
 
 echo "Helm's JupyterHub deployment is torn down."
 echo "If any attendee pods are remaining, you can delete them with 'kubectl delete pod <pod_name>'"
