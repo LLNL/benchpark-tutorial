@@ -39,11 +39,16 @@ class AwsTutorial(System):
             "hardware_key": str(hardware_descriptions)
             + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
         },
+        "c7i.12xlarge": {
+            "system_site": "aws",
+            "hardware_key": str(hardware_descriptions)
+            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+        },
     }
 
     variant(
         "instance_type",
-        values=("c7i.48xlarge", "c7i.metal-48xl", "c7i.24xlarge", "c7i.metal-24xl"),
+        values=("c7i.48xlarge", "c7i.metal-48xl", "c7i.24xlarge", "c7i.metal-24xl", "c7i.12xlarge"),
         default="c7i.24xlarge",
         description="AWS instance type",
     )

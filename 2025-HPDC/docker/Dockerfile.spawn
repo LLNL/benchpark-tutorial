@@ -83,6 +83,7 @@ RUN cmake \
 # rm -rf /tmp/build-xsbench
 
 COPY ./tutorial-code/caliper-tutorial/tutorial ${HOME}/caliper-tutorial/
+COPY ./tutorial-code/caliper-tutorial/apps ${HOME}/caliper-tutorial/apps
 COPY ./tutorial-code/thicket-tutorial/data/lassen ${HOME}/thicket-tutorial/data/lassen
 COPY ./tutorial-code/thicket-tutorial/data/quartz ${HOME}/thicket-tutorial/data/quartz
 COPY ./tutorial-code/thicket-tutorial/notebooks/01_thicket_tutorial.ipynb ${HOME}/thicket-tutorial/notebooks/01_thicket_tutorial.ipynb

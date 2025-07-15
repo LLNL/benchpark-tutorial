@@ -245,7 +245,7 @@ spec:
             - --cloud-provider=aws
             - --skip-nodes-with-local-storage=false
             - --expander=least-waste
-            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/jupyterhub
+            - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/hpdc-2025-c7i-48xlarge
           volumeMounts:
             # Mount the CA SSL/TLS certificates into the container
             - name: ssl-certs
