@@ -14,7 +14,6 @@ else
     mkdir -p /etc/flux
     cat > /etc/flux/resource.toml <<EOF
     [resource]
-    rediscover = true
     noverify = true
     
     [[resource.config]]
