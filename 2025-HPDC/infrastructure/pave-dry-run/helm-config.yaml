@@ -76,7 +76,7 @@ singleuser:
   # If needed, specify a custom entrypoint into the spawner image.
   # For more information, look at the documentation for Docker ENTRYPOINT and CMD directives:
   # https://www.docker.com/blog/docker-best-practices-choosing-between-run-cmd-and-entrypoint/
-  cmd: /entrypoint.sh
+  cmd: ["/entrypoint.sh"]
   # Specify the init image for the tutorial.
   # This image is optional, but it can be used to do last second configuration or installation of files
   # before the user gains control of the pod.
