@@ -10,7 +10,7 @@ hub:
   config:
     # Define a password for login
     DummyAuthenticator:
-      password: butter
+      password: hpctutorial25
     JupyterHub:
       admin_access: true
       authenticator_class: dummy
@@ -36,21 +36,20 @@ hub:
 
   # Define resource usage for JupyterHub
   # For large tutorials, it is recommended to set these higher
-
+  
   # We are just using defualt resource usage
+  
 
   # Define custom hostname for JupyterHub
-
-proxy:
-  https:
-    enabled: true
-    type: letsencrypt
-    letsencrypt:
-      contactEmail: you@email.com
-  service:
-    type: ClusterIP
-ingress:
-  enabled: true
+  
+  proxy:
+    https:
+      enabled: true
+      hosts:
+        - https://software.llnl.gov/benchpark/hpdc-25-tutorial
+      letsencrypt:
+        contactEmail: you@email.com
+  
 
 # Based on optimization recommendations from:
 # https://z2jh.jupyter.org/en/latest/administrator/optimization.html#scaling-up-in-time-user-placeholders
@@ -83,7 +82,7 @@ singleuser:
   # If needed, specify a custom entrypoint into the spawner image.
   # For more information, look at the documentation for Docker ENTRYPOINT and CMD directives:
   # https://www.docker.com/blog/docker-best-practices-choosing-between-run-cmd-and-entrypoint/
-  cmd: /entrypoint.sh
+  cmd: ["/entrypoint.sh"]
   # Specify the init image for the tutorial.
   # This image is optional, but it can be used to do last second configuration or installation of files
   # before the user gains control of the pod.
@@ -125,3 +124,4 @@ singleuser:
     extraVolumeMounts:
       - name: shm-volume
         mountPath: /dev/shm
+    

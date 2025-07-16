@@ -6,7 +6,7 @@
 
 hub:
   # Maximum number of users with spawned JupyterLab environments (i.e., pods) at a time
-  concurrentSpawnLimit: 2
+  concurrentSpawnLimit: 30
   config:
     # Define a password for login
     DummyAuthenticator:
@@ -68,15 +68,15 @@ singleuser:
     pullPolicy: Always
   # Specify the minimum (i.e., guarantee) and maximum (i.e., limit) amount of resources per user
   cpu:
-    limit: 190
-    guarantee: 190
+    limit: 32
+    guarantee: 32
   memory:
-    limit: "350G"
-    guarantee: "350G"
+    limit: "64G"
+    guarantee: "64G"
   # If needed, specify a custom entrypoint into the spawner image.
   # For more information, look at the documentation for Docker ENTRYPOINT and CMD directives:
   # https://www.docker.com/blog/docker-best-practices-choosing-between-run-cmd-and-entrypoint/
-  cmd: ["/entrypoint.sh"]
+  cmd: ["/entrypoint.sh", "32"]
   # Specify the init image for the tutorial.
   # This image is optional, but it can be used to do last second configuration or installation of files
   # before the user gains control of the pod.
