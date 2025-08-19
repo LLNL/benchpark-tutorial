@@ -1,9 +1,9 @@
 {
     "tag": [
-        "hpdc-2025"
+        "hpcic-2025"
     ],
     "tutorial_dir": [
-        "2025-HPDC"
+        "2025-HPCIC"
     ],
     "docker_os": [
         "linux"
