@@ -1,7 +1,8 @@
 name: Build containers for testing PRs 
 
 on:
-  pull_request: []
+  pull_request:
+    branches: [ "develop" ]
       
 jobs:
   setup_shared_matrix:
