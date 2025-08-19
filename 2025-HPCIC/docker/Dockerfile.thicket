@@ -1,0 +1,18 @@
+# Copyright 2025 Lawrence Livermore National Security, LLC and other
+# Benchpark developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# For testing
+# FROM test-caliper
+
+FROM ghcr.io/llnl/caliper:hpcic-2025
+
+USER root
+
+RUN . /opt/global_py_venv/bin/activate && \
+    python3 -m pip install llnl-hatchet==2024.1.3 && \
+    python3 -m pip install "llnl-thicket[plotting] @ git+https://github.com/LLNL/thicket.git@develop-2024-11-02"
+# python3 -m pip install llnl-thicket[extrap,plotting]==2024.2.1
+
+USER ${NB_USER}
