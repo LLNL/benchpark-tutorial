@@ -9,15 +9,18 @@ on:
         required: true
       tutorial_dir:
         type: string
-        description: The directory (relative to repo root) for the tutorial you want to build 
+        description: The directory (relative to repo root) for the tutorial you want to build
         required: true
-      
+
+permissions:
+  packages: write
+
 jobs:
   setup_shared_matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix_data: ${{ steps.set-matrix.outputs.matrix_data }}
-        
+
     steps:
       - id: set-matrix
         run: |
@@ -39,7 +42,7 @@ jobs:
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
           - ["docker/Dockerfile.caliper", "ghcr.io/llnl/caliper"]
-            
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -48,17 +51,17 @@ jobs:
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
       with:
-        tool-cache: true 
+        tool-cache: true
         android: true
         dotnet: true
         haskell: true
         large-packages: true
-        docker-images: false 
+        docker-images: false
         swap-storage: true
-          
+
     - name: Set up Docker
       uses: docker/setup-docker-action@v4
-        
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
 
@@ -71,13 +74,13 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-            
+
     - name: Pull layers if they exist
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker pull ${container} || echo "${container} has not yet been pushed"
-          
-    - name: Build container 
+
+    - name: Build container
       env:
         context: ${{ matrix.tutorial_dir }}
         dockerfile: ${{ matrix.containers_to_build[0] }}
@@ -109,7 +112,7 @@ jobs:
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
           - ["docker/Dockerfile.thicket", "ghcr.io/llnl/thicket"]
-            
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -118,17 +121,17 @@ jobs:
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
       with:
-        tool-cache: true 
+        tool-cache: true
         android: true
         dotnet: true
         haskell: true
         large-packages: true
-        docker-images: false 
+        docker-images: false
         swap-storage: true
-          
+
     - name: Set up Docker
       uses: docker/setup-docker-action@v4
-        
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
 
@@ -147,7 +150,7 @@ jobs:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker pull ${container} || echo "${container} has not yet been pushed"
 
-    - name: Build container 
+    - name: Build container
       env:
         context: ${{ matrix.tutorial_dir }}
         dockerfile: ${{ matrix.containers_to_build[0] }}
@@ -161,7 +164,7 @@ jobs:
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker push ${container}
-          
+
   build_benchpark_container:
     needs:
       - setup_shared_matrix
@@ -179,7 +182,7 @@ jobs:
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
           - ["docker/Dockerfile.benchpark", "ghcr.io/llnl/benchpark"]
-            
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -188,17 +191,17 @@ jobs:
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
       with:
-        tool-cache: true 
+        tool-cache: true
         android: true
         dotnet: true
         haskell: true
         large-packages: true
-        docker-images: false 
+        docker-images: false
         swap-storage: true
-          
+
     - name: Set up Docker
       uses: docker/setup-docker-action@v4
-        
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
 
@@ -216,8 +219,8 @@ jobs:
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker pull ${container} || echo "${container} has not yet been pushed"
-          
-    - name: Build container 
+
+    - name: Build container
       env:
         context: ${{ matrix.tutorial_dir }}
         dockerfile: ${{ matrix.containers_to_build[0] }}
@@ -249,7 +252,7 @@ jobs:
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
           - ["docker/Dockerfile.spawn", "ghcr.io/llnl/reproducible-benchmarking-spawn"]
-            
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -258,17 +261,17 @@ jobs:
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
       with:
-        tool-cache: true 
+        tool-cache: true
         android: true
         dotnet: true
         haskell: true
         large-packages: true
-        docker-images: false 
+        docker-images: false
         swap-storage: true
-          
+
     - name: Set up Docker
       uses: docker/setup-docker-action@v4
-        
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
 
@@ -286,8 +289,8 @@ jobs:
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker pull ${container} || echo "${container} has not yet been pushed"
-          
-    - name: Build container 
+
+    - name: Build container
       env:
         context: ${{ matrix.tutorial_dir }}
         dockerfile: ${{ matrix.containers_to_build[0] }}
@@ -301,7 +304,7 @@ jobs:
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker push ${container}
-          
+
   build_init_container:
     needs:
       - setup_shared_matrix
@@ -310,7 +313,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        tag: 
+        tag:
           - ${{ github.event.inputs.tag }}
         tutorial_dir:
           - ${{ github.event.inputs.tutorial_dir }}
@@ -318,7 +321,7 @@ jobs:
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
           - ["docker/Dockerfile.init", "ghcr.io/llnl/reproducible-benchmarking-init"]
-            
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -327,17 +330,17 @@ jobs:
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
       with:
-        tool-cache: true 
+        tool-cache: true
         android: true
         dotnet: true
         haskell: true
         large-packages: true
-        docker-images: false 
+        docker-images: false
         swap-storage: true
-          
+
     - name: Set up Docker
       uses: docker/setup-docker-action@v4
-        
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
 
@@ -355,8 +358,8 @@ jobs:
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker pull ${container} || echo "${container} has not yet been pushed"
-          
-    - name: Build container 
+
+    - name: Build container
       env:
         context: ${{ matrix.tutorial_dir }}
         dockerfile: ${{ matrix.containers_to_build[0] }}
@@ -370,7 +373,7 @@ jobs:
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker push ${container}
-          
+
   build_hub_container:
     needs:
       - setup_shared_matrix
@@ -379,7 +382,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        tag: 
+        tag:
           - ${{ github.event.inputs.tag }}
         tutorial_dir:
           - ${{ github.event.inputs.tutorial_dir }}
@@ -387,7 +390,7 @@ jobs:
         docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
         containers_to_build:
           - ["docker/Dockerfile.hub", "ghcr.io/llnl/reproducible-benchmarking-hub"]
-            
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -396,17 +399,17 @@ jobs:
     - name: Remove unneeded stuff to make space for container
       uses: jlumbroso/free-disk-space@v1.3.1
       with:
-        tool-cache: true 
+        tool-cache: true
         android: true
         dotnet: true
         haskell: true
         large-packages: true
-        docker-images: false 
+        docker-images: false
         swap-storage: true
-          
+
     - name: Set up Docker
       uses: docker/setup-docker-action@v4
-        
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
 
@@ -424,8 +427,8 @@ jobs:
       env:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker pull ${container} || echo "${container} has not yet been pushed"
-          
-    - name: Build container 
+
+    - name: Build container
       env:
         context: ${{ matrix.tutorial_dir }}
         dockerfile: ${{ matrix.containers_to_build[0] }}
