@@ -2,7 +2,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 # Define the name of the cluster and the deployment region
 metadata:
-  name: hpcic-2025-tutorial
+  name: perftools-hpcic-2025-tutorial
   region: us-east-1
 
 # Create the IAM policies needed to enable the autoscaler and storage
