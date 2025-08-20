@@ -6,7 +6,7 @@
 
 hub:
   # Maximum number of users with spawned JupyterLab environments (i.e., pods) at a time
-  concurrentSpawnLimit: 30
+  concurrentSpawnLimit: 14
   config:
     # Define a password for login
     DummyAuthenticator:
@@ -118,3 +118,4 @@ singleuser:
     extraVolumeMounts:
       - name: shm-volume
         mountPath: /dev/shm
+    
