@@ -1,7 +1,7 @@
-tutorial_name = "hpcic-2025-tutorial"
+tutorial_name = "perftools-hpcic-2025-tutorial"
 
 [aws.eksctl]
-cluster_name = "hpcic-2025-tutorial"
+cluster_name = "perftools-hpcic-2025-tutorial"
 cluster_deployment_region = "us-east-1"
 cluster_availability_zones = [
     "us-east-1a",

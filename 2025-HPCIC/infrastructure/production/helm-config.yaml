@@ -118,3 +118,4 @@ singleuser:
     extraVolumeMounts:
       - name: shm-volume
         mountPath: /dev/shm
+    
