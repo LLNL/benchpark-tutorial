@@ -1,6 +1,6 @@
-# Deploy hpcic-2025-tutorial to AWS Elastic Kubernetes Service (EKS)
+# Deploy perftools-hpcic-2025-dry-run to AWS Elastic Kubernetes Service (EKS)
 
-These config files and scripts can be used to deploy the hpcic-2025-tutorial tutorial to EKS.
+These config files and scripts can be used to deploy the perftools-hpcic-2025-dry-run tutorial to EKS.
 
 The sections below walk you through the steps to deploying your cluster. All commands in these
 sections should be run from the same directory as this README.
