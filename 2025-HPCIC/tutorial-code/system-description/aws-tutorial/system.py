@@ -7,7 +7,7 @@ import json
 import subprocess
 
 from benchpark.directives import maintainers, variant
-from benchpark.openmpsystem import OpenMPSystem
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 from benchpark.system import System
 
