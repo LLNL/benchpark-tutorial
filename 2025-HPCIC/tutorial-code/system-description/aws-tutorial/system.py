@@ -7,7 +7,7 @@ import json
 import subprocess
 
 from benchpark.directives import maintainers, variant
-from benchpark.openmpsystem import OpenMPSystem
+from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
 from benchpark.system import System
 
@@ -55,7 +55,7 @@ class AwsTutorial(System):
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPSystem()]
+        self.programming_models = [OpenMPCPUOnlySystem()]
 
         self.scheduler = "flux"
         # TODO: for some reason I have to index to get value, even if multi=False
