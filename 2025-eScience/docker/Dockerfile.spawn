@@ -1,0 +1,113 @@
+# Copyright 2025 Lawrence Livermore National Security, LLC and other
+# Benchpark developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# For testing
+# FROM test-benchpark
+
+FROM ghcr.io/llnl/benchpark:escience-2025
+
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    ca-certificates \
+    dnsutils \
+    iputils-ping \
+    tini
+
+SHELL [ "/bin/bash", "-c" ]
+
+COPY ./docker/requirements.txt /requirements.txt
+
+RUN . /opt/global_py_venv/bin/activate && \
+    # Needed for some viz in thicket-tutorial
+    /opt/global_py_venv/bin/python3 -m pip install plotly[express] && \
+    /opt/global_py_venv/bin/python3 -m pip install -r /requirements.txt && \
+    /opt/global_py_venv/bin/python3 -m pip install -U jupyter ipython ipykernel && \
+    /opt/global_py_venv/bin/python3 -m ipykernel install --prefix=/usr/local --name 'benchpark-tutorial-kernel'
+
+COPY ./docker/kitware-archive.sh /tmp
+
+RUN /tmp/kitware-archive.sh && \
+    apt install -y cmake && \
+    which cmake && \
+    cmake --version && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY ./tutorial-code/thicket-tutorial/requirements.txt /tmp/thicket-tutorial/requirements.txt
+
+RUN . /opt/global_py_venv/bin/activate && \
+    python3 -m pip install extrap scikit-learn seaborn
+# NOTE: we're not installing the dependencies for thicket-tutorial with
+#       requirements.txt because it hardcodes a version of IPython, which
+#       breaks all sorts of things. Instead, we extract the relevant dependencies
+#       and place them above.
+# python3 -m pip install -r /tmp/thicket-tutorial/requirements.txt
+
+COPY ./tutorial-code/caliper-tutorial/apps /tmp/caliper-tutorial/apps/
+COPY ./tutorial-code/caliper-tutorial/cmake /tmp/caliper-tutorial/cmake/
+
+ENV CALI_TUTORIAL_INSTALL_PREFIX=/usr
+
+RUN cmake \
+    -B /tmp/build-basic-example \
+    -C /tmp/caliper-tutorial/cmake/basic_example.cmake \
+    -DCMAKE_INSTALL_PREFIX="${CALI_TUTORIAL_INSTALL_PREFIX}" \
+    -S /tmp/caliper-tutorial/apps/basic_example && \
+    cmake --build "/tmp/build-basic-example" && \
+    cmake --install "/tmp/build-basic-example"
+# && \
+# rm -rf /tmp/build-basic-example
+
+RUN cmake \
+    -B /tmp/build-lulesh \
+    -C /tmp/caliper-tutorial/cmake/lulesh-mpi.cmake \
+    -DCMAKE_INSTALL_PREFIX="${CALI_TUTORIAL_INSTALL_PREFIX}" \
+    -S /tmp/caliper-tutorial/apps/LULESH && \
+    cmake --build "/tmp/build-lulesh" && \
+    cmake --install "/tmp/build-lulesh"
+# && \
+# rm -rf /tmp/build-lulesh
+
+RUN cmake \
+    -B /tmp/build-xsbench \
+    -C /tmp/caliper-tutorial/cmake/xsbench-mpi.cmake \
+    -DCMAKE_INSTALL_PREFIX="${CALI_TUTORIAL_INSTALL_PREFIX}" \
+    -S /tmp/caliper-tutorial/apps/XSBench && \
+    cmake --build "/tmp/build-xsbench" && \
+    cmake --install "/tmp/build-xsbench"
+# && \
+# rm -rf /tmp/build-xsbench
+
+COPY ./tutorial-code/caliper-tutorial/tutorial ${HOME}/caliper-tutorial/
+COPY ./tutorial-code/caliper-tutorial/apps ${HOME}/caliper-tutorial/apps
+COPY ./tutorial-code/thicket-tutorial/data/lassen ${HOME}/thicket-tutorial/data/lassen
+COPY ./tutorial-code/thicket-tutorial/data/quartz ${HOME}/thicket-tutorial/data/quartz
+COPY ./tutorial-code/thicket-tutorial/notebooks/01_thicket_tutorial.ipynb ${HOME}/thicket-tutorial/notebooks/01_thicket_tutorial.ipynb
+COPY ./tutorial-code/thicket-tutorial/notebooks/02_thicket_rajaperf_clustering.ipynb ${HOME}/thicket-tutorial/notebooks/02_thicket_rajaperf_clustering.ipynb
+COPY ./tutorial-code/thicket-tutorial/LICENSE ${HOME}/thicket-tutorial
+
+COPY tutorial-code/system-description/aws-tutorial ${HOME}/benchpark/systems/aws-tutorial
+COPY tutorial-code/system-description/AWS_Tutorial-c7i-EFA ${HOME}/benchpark/systems/all_hardware_descriptions/AWS_Tutorial-c7i-EFA
+
+RUN chown -R jovyan ${HOME}
+# RUN chmod -R 777 ~/ ${HOME}
+
+WORKDIR ${HOME}
+
+COPY ./docker/spawn-entrypoint.sh /entrypoint.sh
+COPY ./docker/spawn-local-entrypoint.sh /local-entrypoint.sh
+RUN chmod 777 /entrypoint.sh
+RUN chmod 777 /local-entrypoint.sh
+
+USER ${NB_USER}
+ENV SHELL=/usr/bin/bash
+ENV FLUX_URI_RESOLVE_LOCAL=t
+
+EXPOSE 8888
+ENTRYPOINT [ "tini", "--" ]
+
+CMD ["flux", "start", "jupyter", "lab"]
