@@ -10,3 +10,9 @@
 [submodule "2025-HPCIC/tutorial-code/thicket-tutorial"]
 	path = 2025-HPCIC/tutorial-code/thicket-tutorial
 	url = https://github.com/llnl/thicket-tutorial
+[submodule "2025-eScience/tutorial-code/thicket-tutorial"]
+	path = 2025-eScience/tutorial-code/thicket-tutorial
+	url = https://github.com/llnl/thicket-tutorial
+[submodule "2025-eScience/tutorial-code/caliper-tutorial"]
+	path = 2025-eScience/tutorial-code/caliper-tutorial
+	url = https://github.com/daboehme/caliper-tutorial.git
