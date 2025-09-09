@@ -61,10 +61,8 @@ availabilityZones:
 - "us-west-1a"
 - "us-west-1c"
 
-
 # Define rules for nodegroups for each availability zone
 managedNodeGroups:
-
   - name: node-group-us-west-1a
     # Set policies/permissions to autoscale
     iam:
@@ -86,7 +84,6 @@ managedNodeGroups:
     tags:
       k8s.io/cluster-autoscaler/enabled: "true"
       k8s.io/cluster-autoscaler/jupyterhub: "owned"
-
   - name: node-group-us-west-1c
     # Set policies/permissions to autoscale
     iam:
