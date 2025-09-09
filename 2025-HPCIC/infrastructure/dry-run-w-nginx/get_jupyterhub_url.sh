@@ -9,4 +9,4 @@ if ! command -v kubectl >/dev/null 2>&1; then
     exit 1
 fi
 
-kubectl get -o json service proxy-public | jq '.status.loadBalancer.ingress[0].hostname'
+kubectl --namespace ingress-nginx get -o json svc ingress-nginx-controller | jq '.status.loadBalancer.ingress[0].hostname'

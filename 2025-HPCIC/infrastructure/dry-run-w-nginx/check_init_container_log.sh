@@ -9,4 +9,9 @@ if ! command -v kubectl >/dev/null 2>&1; then
     exit 1
 fi
 
-kubectl get -o json service proxy-public | jq '.status.loadBalancer.ingress[0].hostname'
+if [ $# -ne 1 ]; then
+    echo "Usage: ./check_init_container_log.sh <pod_name>"
+    exit 1
+fi
+
+kubectl logs $1 -c init-tutorial-service

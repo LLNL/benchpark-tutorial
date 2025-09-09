@@ -9,4 +9,5 @@ if ! command -v kubectl >/dev/null 2>&1; then
     exit 1
 fi
 
-kubectl get -o json service proxy-public | jq '.status.loadBalancer.ingress[0].hostname'
+hub_pod_id=$(kubectl get pods -n default --no-headers=true | awk '/hub/{print $1}')
+kubectl logs $hub_pod_id
