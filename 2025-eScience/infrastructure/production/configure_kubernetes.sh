@@ -21,6 +21,9 @@ echo "Patching the cluster to make the configured storage class the default:"
 kubectl patch storageclass gp3 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 kubectl patch storageclass gp2 -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
 
+echo "Adding nginx to EKS cluster using kubectl:"
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.13.0/deploy/static/provider/cloud/deploy.yaml
+
 echo ""
 echo "Done configuring Kubernetes!"
 echo ""
