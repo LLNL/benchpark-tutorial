@@ -27,7 +27,7 @@ fi
 # if the JupyterHub deployment failed or was previously torn down
 set +e
 echo "Tearing down JupyterHub and uninstalling everything related to Helm:"
-helm uninstall escience-2025-tutorial-jupyter
+helm uninstall perftools-hpcic-2025-dry-run-jupyter
 set -e
 
 echo ""

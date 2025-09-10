@@ -1,7 +1,7 @@
-tutorial_name = "escience-2025-dry-run"
+tutorial_name = "perftools-hpcic-2025-dry-run"
 
 [aws.eksctl]
-cluster_name = "escience-2025-dry-run"
+cluster_name = "perftools-hpcic-2025-dry-run"
 cluster_deployment_region = "us-west-1"
 cluster_availability_zones = [
     "us-west-1a",
@@ -39,7 +39,7 @@ use_nginx = true
 hub_container_image = "jupyterhub/k8s-hub"
 hub_container_tag = "4.2.0"
 spawner_container_image = "ghcr.io/llnl/reproducible-benchmarking-spawn"
-spawner_container_tag = "escience-2025"
+spawner_container_tag = "hpcic-2025"
 spawner_image_entrypoint = "/entrypoint.sh 32"
 cpu_min = "32"
 cpu_max = "32"
@@ -47,7 +47,7 @@ mem_min = "64G"
 mem_max = "64G"
 provide_extra_shmem = true
 init_container_image = "ghcr.io/llnl/reproducible-benchmarking-init"
-init_container_tag = "escience-2025"
+init_container_tag = "hpcic-2025"
 init_image_entrypoint = "/entrypoint.sh"
 
 [aws."utility scripts"]

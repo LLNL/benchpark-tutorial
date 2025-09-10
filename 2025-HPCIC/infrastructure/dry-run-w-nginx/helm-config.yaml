@@ -41,6 +41,9 @@ hub:
   # Define custom hostname for JupyterHub
   # We are not using a custom hostname
   
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
 
 # Based on optimization recommendations from:
 # https://z2jh.jupyter.org/en/latest/administrator/optimization.html#scaling-up-in-time-user-placeholders

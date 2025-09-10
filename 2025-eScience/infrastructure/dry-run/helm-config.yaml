@@ -36,14 +36,14 @@ hub:
 
   # Define resource usage for JupyterHub
   # For large tutorials, it is recommended to set these higher
-  
   # We are just using defualt resource usage
-  
 
   # Define custom hostname for JupyterHub
-  
   # We are not using a custom hostname
   
+ingress:
+  enabled: true
+  ingressClassName: "nginx"
 
 # Based on optimization recommendations from:
 # https://z2jh.jupyter.org/en/latest/administrator/optimization.html#scaling-up-in-time-user-placeholders
@@ -118,4 +118,3 @@ singleuser:
     extraVolumeMounts:
       - name: shm-volume
         mountPath: /dev/shm
-    

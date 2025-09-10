@@ -9,9 +9,6 @@ if ! command -v helm >/dev/null 2>&1; then
     exit 1
 fi
 
-helm uninstall escience-2025-dry-run-jupyter
+helm upgrade perftools-hpcic-2025-dry-run-jupyter jupyterhub/jupyterhub  --values ./helm-config.yaml
 
-echo "Helm's JupyterHub deployment is torn down."
-echo "If any attendee pods are remaining, you can delete them with 'kubectl delete pod <pod_name>'"
-echo ""
-echo "To recreate the JupyterHub deployment, just run deploy_jupyterhub.sh again."
+echo "The JupyterHub deployment is updated!"
