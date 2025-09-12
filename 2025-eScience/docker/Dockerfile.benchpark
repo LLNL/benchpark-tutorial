@@ -6,7 +6,7 @@
 # For testing
 # FROM test-thicket
 
-FROM ghcr.io/llnl/thicket:hpcic-2025
+FROM ghcr.io/llnl/thicket:escience-2025
 
 USER root
 
@@ -32,7 +32,7 @@ USER ${NB_USER}
 
 RUN git clone https://github.com/LLNL/benchpark.git ${HOME}/benchpark && \
     cd ${HOME}/benchpark && \
-    git checkout -b develop-2025-08-25 develop-2025-08-25 && \
+    git checkout -b develop-2025-09-10 develop-2025-09-10 && \
     git submodule update --init --recursive
 
 USER root

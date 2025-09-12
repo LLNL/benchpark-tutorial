@@ -64,7 +64,7 @@ singleuser:
   #   5) Copy any necessary local scripts or files and ensure proper permissions
   image:
     name: ghcr.io/llnl/reproducible-benchmarking-spawn
-    tag: "hpcic-2025"
+    tag: "escience-2025"
     pullPolicy: Always
   # Specify the minimum (i.e., guarantee) and maximum (i.e., limit) amount of resources per user
   cpu:
@@ -106,7 +106,7 @@ singleuser:
   #    chown -R 1000 /home/jovyan
   initContainers:
     - name: init-tutorial-service
-      image: ghcr.io/llnl/reproducible-benchmarking-init:hpcic-2025
+      image: ghcr.io/llnl/reproducible-benchmarking-init:escience-2025
       command: ["/entrypoint.sh"]
       imagePullPolicy: Always
   storage:
