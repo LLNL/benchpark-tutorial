@@ -25,7 +25,7 @@ RUN apt-get update && \
 #    liblapack-dev \
 #    libblas-dev \
     liblapacke-dev \
-    libcblas-dev \
+    libatlas-base-dev \
     && rm -rf /var/lib/apt/lists/*
 
 SHELL [ "/bin/bash", "-c" ]
