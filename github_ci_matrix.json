@@ -1,9 +1,9 @@
 {
     "tag": [
-        "hpcic-2025"
+        "eScience-2025"
     ],
     "tutorial_dir": [
-        "2025-HPCIC"
+        "2025-eScience"
     ],
     "docker_os": [
         "linux"
