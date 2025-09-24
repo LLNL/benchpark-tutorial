@@ -16,3 +16,9 @@
 [submodule "2025-eScience/tutorial-code/caliper-tutorial"]
 	path = 2025-eScience/tutorial-code/caliper-tutorial
 	url = https://github.com/daboehme/caliper-tutorial.git
+[submodule "latest/tutorial-code/thicket-tutorial"]
+	path = latest/tutorial-code/thicket-tutorial
+	url = https://github.com/llnl/thicket-tutorial
+[submodule "latest/tutorial-code/caliper-tutorial"]
+	path = latest/tutorial-code/caliper-tutorial
+	url = https://github.com/daboehme/caliper-tutorial
