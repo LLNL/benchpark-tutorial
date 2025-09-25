@@ -1,9 +1,9 @@
 {
     "tag": [
-        "eScience-2025"
+        "latest"
     ],
     "tutorial_dir": [
-        "2025-eScience"
+        "latest"
     ],
     "docker_os": [
         "linux"
