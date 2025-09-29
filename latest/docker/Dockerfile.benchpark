@@ -22,7 +22,7 @@ RUN apt-get update && \
     xz-utils \
     zstd \
     bzip2 \
-    libopenblas-dev \
+    libatlas-base-dev \
     && rm -rf /var/lib/apt/lists/*
 
 SHELL [ "/bin/bash", "-c" ]
