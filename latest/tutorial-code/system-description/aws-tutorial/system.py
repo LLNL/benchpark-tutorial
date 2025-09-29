@@ -3,13 +3,10 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-import json
-import subprocess
-
 from benchpark.directives import maintainers, variant
 from benchpark.openmpsystem import OpenMPCPUOnlySystem
 from benchpark.paths import hardware_descriptions
-from benchpark.system import System
+from benchpark.system import System, compiler_def, compiler_section_for
 
 
 class AwsTutorial(System):
@@ -20,66 +17,55 @@ class AwsTutorial(System):
 
     id_to_resources = {
         "c7i.48xlarge": {
-            "system_site": "aws",
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            "sys_cores_per_node": 192,
+            "sys_mem_per_node_GB": 384,
         },
         "c7i.metal-48xl": {
-            "system_site": "aws",
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            "sys_cores_per_node": 192,
+            "sys_mem_per_node_GB": 384,
         },
         "c7i.24xlarge": {
-            "system_site": "aws",
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            "sys_cores_per_node": 96,
+            "sys_mem_per_node_GB": 192,
         },
         "c7i.metal-24xl": {
-            "system_site": "aws",
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            "sys_cores_per_node": 96,
+            "sys_mem_per_node_GB": 192,
         },
         "c7i.12xlarge": {
-            "system_site": "aws",
-            "hardware_key": str(hardware_descriptions)
-            + "/AWS_Tutorial-zen-EFA/hardware_description.yaml",
+            "sys_cores_per_node": 48,
+            "sys_mem_per_node_GB": 96,
         },
     }
 
     variant(
         "instance_type",
-        values=("c7i.48xlarge", "c7i.metal-48xl", "c7i.24xlarge", "c7i.metal-24xl", "c7i.12xlarge"),
+        values=(
+            "c7i.48xlarge",
+            "c7i.metal-48xl",
+            "c7i.24xlarge",
+            "c7i.metal-24xl",
+            "c7i.12xlarge",
+        ),
         default="c7i.24xlarge",
         description="AWS instance type",
     )
 
     def __init__(self, spec):
         super().__init__(spec)
-        self.programming_models = [OpenMPCPUOnlySystem()]
 
+        # Common attributes across instances
+        self.programming_models = [OpenMPCPUOnlySystem()]
+        self.system_site = "aws"
         self.scheduler = "flux"
-        # TODO: for some reason I have to index to get value, even if multi=False
+        self.hardware_key = (
+            str(hardware_descriptions)
+            + "/AWS_Tutorial-sapphirerapids-EFA/hardware_description.yaml"
+        )
+
         attrs = self.id_to_resources.get(self.spec.variants["instance_type"][0])
         for k, v in attrs.items():
             setattr(self, k, v)
-
-        json_resource_spec = subprocess.check_output("flux resource R", shell=True)
-        resource_dict = json.loads(json_resource_spec)
-        self.sys_cores_per_node = resource_dict["execution"]["R_lite"][0]["children"][
-            "core"
-        ]
-        self.sys_cores_per_node = [int(c) for c in self.sys_cores_per_node.split("-")]
-        self.sys_cores_per_node[-1] += 1
-        self.sys_cores_per_node = len(list(range(*self.sys_cores_per_node)))
-        self.sys_nodes = resource_dict["execution"]["R_lite"][0]["rank"]
-        self.sys_nodes = [int(n) for n in self.sys_nodes.split("-")]
-        self.sys_nodes[-1] += 1
-        self.sys_nodes = len(list(range(*self.sys_nodes)))
-
-    # def system_specific_variables(self):
-    #     return {
-    #         "extra_cmd_opts": '--mpi=pmix --export=ALL,FI_EFA_USE_DEVICE_RDMA=1,FI_PROVIDER="efa",OMPI_MCA_mtl_base_verbose=100',
-    #     }
 
     def compute_packages_section(self):
         return {
@@ -89,9 +75,10 @@ class AwsTutorial(System):
                     "buildable": False,
                 },
                 "gmake": {"externals": [{"spec": "gmake@4.3", "prefix": "/usr"}]},
-                "lapack": {
-                    "externals": [{"spec": "lapack@0.29.2", "prefix": "/usr"}],
-                    "buildable": False,
+                "blas": {"buildable": False},
+                "lapack": {"buildable": False},
+                "atlas": {
+                    "externals": [{"spec": "atlas@3.10.3", "prefix": "/usr"}],
                 },
                 "mpi": {"buildable": False},
                 "openmpi": {
@@ -103,7 +90,7 @@ class AwsTutorial(System):
                     ]
                 },
                 "cmake": {
-                    "externals": [{"spec": "cmake@4.0.2", "prefix": "/usr"}],
+                    "externals": [{"spec": "cmake@4.1.1", "prefix": "/usr"}],
                     "buildable": False,
                 },
                 "git": {
@@ -164,7 +151,7 @@ class AwsTutorial(System):
                 "caliper": {
                     "externals": [
                         {
-                            "spec": "caliper@master%gcc@11.4.0+adiak+mpi",
+                            "spec": "caliper@master+adiak+mpi%gcc@11.4.0",
                             "prefix": "/usr",
                         }
                     ],
@@ -212,49 +199,22 @@ class AwsTutorial(System):
         }
 
     def compute_compilers_section(self):
-        return {
-            "compilers": [
-                {
-                    "compiler": {
-                        "spec": "gcc@11.4.0",
-                        "paths": {
-                            "cc": "/usr/bin/gcc",
-                            "cxx": "/usr/bin/g++",
-                            "f77": "/usr/bin/gfortran-11",
-                            "fc": "/usr/bin/gfortran-11",
-                        },
-                        "flags": {},
-                        "operating_system": "ubuntu22.04",
-                        "target": "x86_64",
-                        "modules": [],
-                        "environment": {},
-                        "extra_rpaths": [],
-                    }
-                }
-            ]
-        }
+        return compiler_section_for(
+            "gcc",
+            [
+                compiler_def(
+                    "gcc@11.4.0 languages=c,c++,fortran",
+                    "/usr/",
+                    {"c": "gcc", "cxx": "g++", "fortran": "gfortran-11"},
+                )
+            ],
+        )
 
     def compute_software_section(self):
         return {
             "software": {
                 "packages": {
                     "default-compiler": {"pkg_spec": "gcc@11.4.0"},
-                    "default-mpi": {"pkg_spec": "openmpi@4.0%gcc@11.4.0"},
-                    "compiler-gcc": {"pkg_spec": "gcc@11.4.0"},
-                    "lapack": {"pkg_spec": "lapack@0.29.2"},
-                    "mpi-gcc": {"pkg_spec": "openmpi@4.0%gcc@11.4.0"},
                 }
             }
-        }
-
-    def compute_spack_config_section(self):
-        return {
-            "config": {},
-            "concretizer": {},
-            "modules": {},
-            "packages": {},
-            "repos": [],
-            "compilers": [],
-            "mirrors": {},
-            "providers": {"mpi": ["openmpi"]},
         }
