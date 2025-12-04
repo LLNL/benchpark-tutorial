@@ -22,3 +22,9 @@
 [submodule "latest/tutorial-code/caliper-tutorial"]
 	path = latest/tutorial-code/caliper-tutorial
 	url = https://github.com/daboehme/caliper-tutorial
+[submodule "2026-RIKEN/tutorial-code/thicket-tutorial"]
+	path = 2026-RIKEN/tutorial-code/thicket-tutorial
+	url = https://github.com/llnl/thicket-tutorial.git
+[submodule "2026-RIKEN/tutorial-code/caliper-tutorial"]
+	path = 2026-RIKEN/tutorial-code/caliper-tutorial
+	url = https://github.com/daboehme/caliper-tutorial.git
