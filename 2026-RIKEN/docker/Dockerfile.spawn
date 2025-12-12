@@ -50,7 +50,7 @@ RUN . /opt/global_py_venv/bin/activate && \
 COPY ./tutorial-code/caliper-tutorial/apps /tmp/caliper-tutorial/apps/
 COPY ./tutorial-code/caliper-tutorial/cmake /tmp/caliper-tutorial/cmake/
 
-ENV CALI_TUTORIAL_INSTALL_PREFIX=/usr
+ENV CALI_TUTORIAL_INSTALL_PREFIX=${HOME}/Caliper/install
 
 RUN cmake \
     -B /tmp/build-basic-example \
