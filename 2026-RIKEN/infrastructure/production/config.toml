@@ -32,7 +32,7 @@ memory_min = "600Mi"
 
 [aws.Helm]
 max_concurrent_users = 30
-hub_password = "hpctutorial25"
+hub_password = "hpctutorial26"
 hub_db_capacity = "32Gi"
 ebs_storage_type = "gp3"
 use_nginx = true
