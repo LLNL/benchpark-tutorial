@@ -69,15 +69,15 @@ managedNodeGroups:
       withAddonPolicies:
         autoScaler: true
     # Instance type to allocate
-    instanceType: c7i.12xlarge
+    instanceType: c6i.4xlarge"
     # Size of storage volume for the availability zone, in gigabytes
     volumeSize: 30
     # Number of nodes to start with in this availability zone
-    desiredCapacity: 15
-    # Minimum number of nodes that will always be allocated in this availability zone
-    minSize: 15
+    desiredCapacity: 10
+    # Minimum number o0 nodes that will always be allocated in this availability zone
+    minSize: 10
     # Maximum number of nodes that will every be allocated in this availability zone
-    maxSize: 100
+    maxSize: 20
     privateNetworking: true
     availabilityZones:
       - us-east-1a
@@ -90,15 +90,15 @@ managedNodeGroups:
       withAddonPolicies:
         autoScaler: true
     # Instance type to allocate
-    instanceType: c7i.12xlarge
+    instanceType: c6i.4xlarge"
     # Size of storage volume for the availability zone, in gigabytes
     volumeSize: 30
     # Number of nodes to start with in this availability zone
-    desiredCapacity: 15
+    desiredCapacity: 10
     # Minimum number of nodes that will always be allocated in this availability zone
-    minSize: 15
+    minSize: 10
     # Maximum number of nodes that will every be allocated in this availability zone
-    maxSize: 100
+    maxSize: 20
     privateNetworking: true
     availabilityZones:
       - us-east-1b
