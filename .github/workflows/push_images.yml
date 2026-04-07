@@ -165,6 +165,76 @@ jobs:
         container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
       run: docker push ${container}
 
+  build_treescape_container:
+    needs:
+      - setup_shared_matrix
+      - build_thicket_container
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        tag:
+          - ${{ github.event.inputs.tag }}
+        tutorial_dir:
+          - ${{ github.event.inputs.tutorial_dir }}
+        docker_os: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_os }}
+        docker_arch: ${{ fromJson(needs.setup_shared_matrix.outputs.matrix_data).docker_arch }}
+        containers_to_build:
+          - ["docker/Dockerfile.treescape", "ghcr.io/llnl/treescape"]
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: "recursive"
+
+    - name: Remove unneeded stuff to make space for container
+      uses: jlumbroso/free-disk-space@v1.3.1
+      with:
+        tool-cache: true
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: false
+        swap-storage: true
+
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v4
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to GHCR
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Pull layers if they exist
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+      run: docker pull ${container} || echo "${container} has not yet been pushed"
+
+    - name: Build container
+      env:
+        context: ${{ matrix.tutorial_dir }}
+        dockerfile: ${{ matrix.containers_to_build[0] }}
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+        platform: "${{ matrix.docker_os }}/${{ matrix.docker_arch }}"
+      run: |
+        cd ${context}
+        docker build --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
+
+    - name: Deploy container
+      env:
+        container: "${{ matrix.containers_to_build[1] }}:${{ matrix.tag }}"
+      run: docker push ${container}
+
   build_benchpark_container:
     needs:
       - setup_shared_matrix
