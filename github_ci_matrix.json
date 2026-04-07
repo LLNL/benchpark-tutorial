@@ -1,9 +1,9 @@
 {
     "tag": [
-        "riken-2026"
+        "latest"
     ],
     "tutorial_dir": [
-        "2026-RIKEN"
+        "latest"
     ],
     "docker_os": [
         "linux"
