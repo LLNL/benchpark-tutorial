@@ -39,8 +39,6 @@ RUN /tmp/kitware-archive.sh && \
 
 COPY ./tutorial-code/thicket-tutorial/requirements.txt /tmp/thicket-tutorial/requirements.txt
 
-COPY ./tutorial-code/treescape-media/requirements.txt /tmp/treescape-media/requirements.txt
-
 RUN . /opt/global_py_venv/bin/activate && \
     python3 -m pip install extrap scikit-learn seaborn
 # NOTE: we're not installing the dependencies for thicket-tutorial with
