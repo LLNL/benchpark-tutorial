@@ -11,6 +11,7 @@ FROM ghcr.io/llnl/thicket:latest
 USER root
 
 RUN . /opt/global_py_venv/bin/activate && \
-    python3 -m pip install "git+https://github.com/LLNL/treescape.git@main-2026-04-01"
+    git clone --depth 1 --branch main-2026-04-01 https://github.com/LLNL/treescape
+    python3 -m pip install .
 
 USER ${NB_USER}
