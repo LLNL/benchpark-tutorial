@@ -91,7 +91,7 @@ COPY ./tutorial-code/thicket-tutorial/notebooks/01_thicket_tutorial.ipynb ${HOME
 COPY ./tutorial-code/thicket-tutorial/notebooks/02_thicket_rajaperf_clustering.ipynb ${HOME}/thicket-tutorial/notebooks/02_thicket_rajaperf_clustering.ipynb
 COPY ./tutorial-code/thicket-tutorial/LICENSE ${HOME}/thicket-tutorial
 
-COPY ./tutorial-code/treescape-media/datasets/newdemo/test ${HOME}/treescape-media/data/newdemo/test
+COPY ./tutorial-code/treescape-media/datasets/newdemo/test ${HOME}/treescape-media/datasets/newdemo/test
 COPY ./tutorial-code/treescape-media/examples/NightlyTestDemo_local.ipynb ${HOME}/treescape-media/examples/NightlyTestDemo_local.ipynb
 COPY ./tutorial-code/treescape-media/LICENSE ${HOME}/treescape-media
 
