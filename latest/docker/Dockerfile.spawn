@@ -84,11 +84,16 @@ RUN cmake \
 
 COPY ./tutorial-code/caliper-tutorial/tutorial ${HOME}/caliper-tutorial/
 COPY ./tutorial-code/caliper-tutorial/apps ${HOME}/caliper-tutorial/apps
+
 COPY ./tutorial-code/thicket-tutorial/data/lassen ${HOME}/thicket-tutorial/data/lassen
 COPY ./tutorial-code/thicket-tutorial/data/quartz ${HOME}/thicket-tutorial/data/quartz
 COPY ./tutorial-code/thicket-tutorial/notebooks/01_thicket_tutorial.ipynb ${HOME}/thicket-tutorial/notebooks/01_thicket_tutorial.ipynb
 COPY ./tutorial-code/thicket-tutorial/notebooks/02_thicket_rajaperf_clustering.ipynb ${HOME}/thicket-tutorial/notebooks/02_thicket_rajaperf_clustering.ipynb
 COPY ./tutorial-code/thicket-tutorial/LICENSE ${HOME}/thicket-tutorial
+
+COPY ./tutorial-code/treescape-media/datasets/newdemo/test ${HOME}/treescape-media/data/newdemo/test
+COPY ./tutorial-code/treescape-media/examples/NightlyTestDemo_local.ipynb ${HOME}/treescape-media/examples/NightlyTestDemo_local.ipynb
+COPY ./tutorial-code/treescape-media/LICENSE ${HOME}/treescape-media
 
 COPY tutorial-code/system-description/aws-tutorial ${HOME}/benchpark/systems/aws-tutorial
 COPY tutorial-code/system-description/AWS_Tutorial-c7i-EFA ${HOME}/benchpark/systems/all_hardware_descriptions/AWS_Tutorial-c7i-EFA

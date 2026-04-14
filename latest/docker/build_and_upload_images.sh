@@ -20,7 +20,7 @@ TAG="$1"
 
 DOCKER_PLATFORMS="linux/amd64,linux/arm64"
 
-TO_BUILD_IDS=( "caliper" "thicket" "benchpark" "init" "spawn" )
+TO_BUILD_IDS=( "caliper" "thicket" "treescape" "benchpark" "init" "spawn" )
 
 if [ $# -ge 2 ]; then
     TO_BUILD_IDS=( "$2" )
@@ -28,6 +28,7 @@ fi
 
 caliper_IMAGE="ghcr.io/ilumsden/latest-caliper"
 thicket_IMAGE="ghcr.io/ilumsden/latest-thicket"
+treescape_IMAGE="ghcr.io/ilumsden/latest-treescape"
 benchpark_IMAGE="ghcr.io/ilumsden/latest-benchpark"
 init_IMAGE="ghcr.io/ilumsden/latest-test-init"
 spawn_IMAGE="ghcr.io/ilumsden/latest-test-spawn"

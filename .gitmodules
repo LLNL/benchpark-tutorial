@@ -28,3 +28,6 @@
 [submodule "2026-RIKEN/tutorial-code/caliper-tutorial"]
 	path = 2026-RIKEN/tutorial-code/caliper-tutorial
 	url = https://github.com/daboehme/caliper-tutorial.git
+[submodule "latest/tutorial-code/treescape-media"]
+	path = latest/tutorial-code/treescape-media
+	url = https://github.com/llnl/treescape-media
