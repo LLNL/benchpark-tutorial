@@ -238,7 +238,7 @@ jobs:
   build_benchpark_container:
     needs:
       - setup_shared_matrix
-      - build_thicket_container
+      - build_treescape_container
     runs-on: ubuntu-latest
 
     strategy:
