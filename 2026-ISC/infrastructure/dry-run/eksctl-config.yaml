@@ -2,7 +2,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 # Define the name of the cluster and the deployment region
 metadata:
-  name: 2026-isc-dry-run
+  name: isc-2026-dry-run
   region: us-west-1
 
 # Create the IAM policies needed to enable the autoscaler and storage
