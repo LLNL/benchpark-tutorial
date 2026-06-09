@@ -37,3 +37,6 @@
 [submodule "2026-ISC/tutorial-code/thicket-tutorial"]
 	path = 2026-ISC/tutorial-code/thicket-tutorial
 	url = https://github.com/llnl/thicket-tutorial.git
+[submodule "2026-ISC/tutorial-code/treescape-media"]
+	path = 2026-ISC/tutorial-code/treescape-media
+	url = https://github.com/llnl/treescape-media.git

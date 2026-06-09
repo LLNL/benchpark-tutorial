@@ -12,7 +12,7 @@ USER root
 
 RUN . /opt/global_py_venv/bin/activate && \
     python3 -m pip install llnl-hatchet==2025.2.0 && \
-    python3 -m pip install "llnl-thicket[plotting] @ git+https://github.com/LLNL/thicket.git@develop-2024-11-02"
+    python3 -m pip install "llnl-thicket[plotting]==2026.1.0"
 # python3 -m pip install llnl-thicket[extrap,plotting]==2024.2.1
 
 USER ${NB_USER}
