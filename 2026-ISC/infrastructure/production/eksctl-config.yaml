@@ -69,7 +69,7 @@ managedNodeGroups:
       withAddonPolicies:
         autoScaler: true
     # Instance type to allocate
-    instanceType: c6i.4xlarge"
+    instanceType: c7i.12xlarge
     # Size of storage volume for the availability zone, in gigabytes
     volumeSize: 30
     # Number of nodes to start with in this availability zone
@@ -90,7 +90,7 @@ managedNodeGroups:
       withAddonPolicies:
         autoScaler: true
     # Instance type to allocate
-    instanceType: c6i.4xlarge
+    instanceType: c7i.12xlarge
     # Size of storage volume for the availability zone, in gigabytes
     volumeSize: 30
     # Number of nodes to start with in this availability zone
