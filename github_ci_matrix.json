@@ -1,9 +1,9 @@
 {
     "tag": [
-        "isc-2026"
+        "ics-2026"
     ],
     "tutorial_dir": [
-        "2026-ISC"
+        "2026-ICS"
     ],
     "docker_os": [
         "linux"
