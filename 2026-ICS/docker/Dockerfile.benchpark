@@ -25,6 +25,7 @@ RUN apt-get update && \
     libatlas-base-dev \
     gettext \
     libncurses-dev \
+    sqlite \
     && rm -rf /var/lib/apt/lists/*
 
 SHELL [ "/bin/bash", "-c" ]
