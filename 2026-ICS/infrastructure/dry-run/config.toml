@@ -2,14 +2,14 @@ tutorial_name = "ics-2026-dry-run"
 
 [aws.eksctl]
 cluster_name = "ics-2026-dry-run"
-cluster_deployment_region = "us-west-1"
+cluster_deployment_region = "eu-west-1"
 cluster_availability_zones = [
-    "us-west-1a",
-    "us-west-1c",
+    "eu-west-1a",
+    "eu-west-1c",
 ]
 
 [[aws.eksctl.cluster_node_groups]]
-zone = "us-west-1a"
+zone = "eu-west-1a"
 instance_type = "c7i.12xlarge"
 volume_size = 30
 desired_size = 2
@@ -17,7 +17,7 @@ min_size = 2
 max_size = 8
 
 [[aws.eksctl.cluster_node_groups]]
-zone = "us-west-1c"
+zone = "eu-west-1c"
 instance_type = "c7i.12xlarge"
 volume_size = 30
 desired_size = 2
