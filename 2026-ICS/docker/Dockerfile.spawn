@@ -95,6 +95,8 @@ COPY ./tutorial-code/treescape-media/datasets/newdemo/test ${HOME}/treescape-med
 COPY ./tutorial-code/treescape-media/examples/NightlyTestDemo_local.ipynb ${HOME}/treescape-media/examples/NightlyTestDemo_local.ipynb
 COPY ./tutorial-code/treescape-media/LICENSE ${HOME}/treescape-media
 
+COPY tutorial-code/system-description/aws-tutorial ${HOME}/benchpark/systems/aws-tutorial
+
 RUN chown -R jovyan ${HOME}
 # RUN chmod -R 777 ~/ ${HOME}
 
