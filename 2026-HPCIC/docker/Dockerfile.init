@@ -1,0 +1,22 @@
+# Copyright 2025 Lawrence Livermore National Security, LLC and other
+# Benchpark developers. See the top-level COPYRIGHT file for details.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+FROM alpine/git
+
+USER root
+
+ENV NB_USER=jovyan \
+    NB_UID=1000 \
+    HOME=/home/jovyan
+
+RUN adduser \
+    -D \
+    -g "Default user" \
+    -u ${NB_UID} \
+    -h ${HOME} \
+    ${NB_USER}
+
+COPY ./docker/init-entrypoint.sh /entrypoint.sh
+RUN chmod 777 /entrypoint.sh

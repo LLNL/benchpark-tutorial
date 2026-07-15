@@ -49,3 +49,12 @@
 [submodule "2026-ICS/tutorial-code/caliper-tutorial"]
 	path = 2026-ICS/tutorial-code/caliper-tutorial
 	url = https://github.com/daboehme/caliper-tutorial.git
+[submodule "2026-HPCIC/tutorial-code/treescape-media"]
+	path = 2026-HPCIC/tutorial-code/treescape-media
+	url = https://github.com/llnl/treescape-media
+[submodule "2026-HPCIC/tutorial-code/thicket-tutorial"]
+	path = 2026-HPCIC/tutorial-code/thicket-tutorial
+	url = https://github.com/llnl/thicket-tutorial
+[submodule "2026-HPCIC/tutorial-code/caliper-tutorial"]
+	path = 2026-HPCIC/tutorial-code/caliper-tutorial
+	url = https://github.com/daboehme/caliper-tutorial
