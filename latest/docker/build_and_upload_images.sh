@@ -47,9 +47,28 @@ fi
 
 echo $(gh auth token) | docker login ghcr.io -u $(gh api user --jq .login) --password-stdin
 
+# Extract Caliper and Adiak versions from caliper-tutorial submodule
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if [ -x "${SCRIPT_DIR}/get_caliper_version.sh" ]; then
+    echo "Extracting Caliper and Adiak versions from caliper-tutorial submodule..."
+    CALIPER_VERSION=$(${SCRIPT_DIR}/get_caliper_version.sh caliper)
+    ADIAK_VERSION=$(${SCRIPT_DIR}/get_caliper_version.sh adiak)
+    echo "Using Caliper version: ${CALIPER_VERSION}"
+    echo "Using Adiak version: ${ADIAK_VERSION}"
+    CALIPER_BUILD_ARGS="--build-arg CALIPER_VERSION=${CALIPER_VERSION} --build-arg ADIAK_VERSION=${ADIAK_VERSION}"
+else
+    echo "Warning: get_caliper_version.sh not found, using default versions"
+    CALIPER_BUILD_ARGS=""
+fi
+
 for bid in ${TO_BUILD_IDS[@]}; do
     CURR_IMAGE_NAME="${bid}_IMAGE"
-    docker build --platform $DOCKER_PLATFORMS -f Dockerfile.$bid -t ${!CURR_IMAGE_NAME}:$TAG .
+    # Add build args for caliper image
+    if [ "$bid" = "caliper" ]; then
+        docker build --platform $DOCKER_PLATFORMS ${CALIPER_BUILD_ARGS} -f Dockerfile.$bid -t ${!CURR_IMAGE_NAME}:$TAG .
+    else
+        docker build --platform $DOCKER_PLATFORMS -f Dockerfile.$bid -t ${!CURR_IMAGE_NAME}:$TAG .
+    fi
     docker push ${!CURR_IMAGE_NAME}:$TAG
 done
 
