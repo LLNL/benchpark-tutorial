@@ -49,15 +49,19 @@ RUN . /opt/global_py_venv/bin/activate && \
 ENV CALI_INSTALL_PREFIX=/usr \
     GIT_CLONE_STAGING_DIR=/tmp
 
+# Build arguments for caliper and adiak versions (extracted from caliper-tutorial submodule)
+ARG CALIPER_VERSION=v2.15.0
+ARG ADIAK_VERSION=v0.5.0
+
 RUN git clone https://github.com/LLNL/Caliper.git ${GIT_CLONE_STAGING_DIR}/Caliper && \
     cd ${GIT_CLONE_STAGING_DIR}/Caliper && \
     git fetch origin && \
-    git checkout v2.12.1 && \
+    git checkout ${CALIPER_VERSION} && \
     git submodule update --init --recursive && \
     git clone https://github.com/LLNL/Adiak.git ${GIT_CLONE_STAGING_DIR}/Adiak && \
     cd ${GIT_CLONE_STAGING_DIR}/Adiak && \
     git fetch origin && \
-    git checkout v0.4.1 && \
+    git checkout ${ADIAK_VERSION} && \
     git submodule update --init --recursive
 
 RUN cd ${GIT_CLONE_STAGING_DIR}/Adiak && \
