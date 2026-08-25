@@ -88,8 +88,9 @@ jobs:
         platform: "${{ matrix.docker_os }}/${{ matrix.docker_arch }}"
       run: |
         cd ${context}
-        CALIPER_VERSION=../scripts/get_caliper_version.sh caliper
-        ADIAK_VERSION=../scripts/get_caliper_version.sh adiak
+        echo -e "CONTEXT ${context}"
+        CALIPER_VERSION=../../scripts/get_caliper_version.sh caliper
+        ADIAK_VERSION=../../scripts/get_caliper_version.sh adiak
         docker build --build-arg CALIPER_VERSION=${CALIPER_VERSION} --build-arg ADIAK_VERSION=${ADIAK_VERSION} --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
 
     - name: Deploy container
