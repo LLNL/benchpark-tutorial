@@ -89,8 +89,8 @@ jobs:
       run: |
         cd ${context}
         echo -e "CONTEXT ${context}"
-        CALIPER_VERSION=../../scripts/get_caliper_version.sh caliper
-        ADIAK_VERSION=../../scripts/get_caliper_version.sh adiak
+        CALIPER_VERSION=$(../../scripts/get_caliper_version.sh ${context} | cut -d " " -f 1)
+        ADIAK_VERSION=$(../../scripts/get_caliper_version.sh ${context} | cut -d " " -f 2)
         docker build --build-arg CALIPER_VERSION=${CALIPER_VERSION} --build-arg ADIAK_VERSION=${ADIAK_VERSION} --progress=plain --platform ${platform} -f ${dockerfile} -t ${container} .
 
     - name: Deploy container

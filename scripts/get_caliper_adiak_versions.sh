@@ -1,16 +1,25 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # Script to extract Caliper and Adiak versions from the caliper-tutorial submodule
 # Usage: ./get_caliper_version.sh [caliper|adiak]
 
+# Output based on requested component
+if [ "$#" -ne 1 ]; then
+    echo "Error: expected 1 argument, got $#" >&2
+    echo "Usage: $0 <workdir>" >&2
+    exit 1
+fi
+
+WORKDIR="$1"
+
 set -e
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-CALIPER_TUTORIAL_PATH="${REPO_ROOT}/latest/tutorial-code/caliper-tutorial"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+CALIPER_TUTORIAL_PATH="${REPO_ROOT}/${WORKDIR}/tutorial-code/caliper-tutorial"
 
 # Ensure the caliper-tutorial submodule is initialized
-if [ ! -d "${CALIPER_TUTORIAL_PATH}/.git" ]; then
+if [ ! -e "${CALIPER_TUTORIAL_PATH}/.git" ]; then
     echo "Error: caliper-tutorial submodule not initialized at ${CALIPER_TUTORIAL_PATH}" >&2
     echo "Please run: git submodule update --init --recursive latest/tutorial-code/caliper-tutorial" >&2
     exit 1
@@ -19,7 +28,7 @@ fi
 cd "${CALIPER_TUTORIAL_PATH}"
 
 # Get the caliper submodule commit hash
-CALIPER_COMMIT=$(git submodule status | grep caliper | awk '{print $1}' | sed 's/^[-+]//')
+CALIPER_COMMIT=$(git submodule status | grep Caliper | awk '{print $1}' | sed 's/^[-+]//')
 
 if [ -z "${CALIPER_COMMIT}" ]; then
     echo "Error: Could not find caliper submodule in caliper-tutorial" >&2
@@ -60,14 +69,4 @@ else
 fi
 
 # Output based on requested component
-if [ $# -eq 0 ]; then
-    echo "CALIPER_VERSION=${CALIPER_VERSION}"
-    echo "ADIAK_VERSION=${ADIAK_VERSION}"
-elif [ "$1" = "caliper" ]; then
-    echo "${CALIPER_VERSION}"
-elif [ "$1" = "adiak" ]; then
-    echo "${ADIAK_VERSION}"
-else
-    echo "Error: Unknown component '$1'. Use 'caliper' or 'adiak'" >&2
-    exit 1
-fi
+echo "${CALIPER_VERSION} ${ADIAK_VERSION}"
